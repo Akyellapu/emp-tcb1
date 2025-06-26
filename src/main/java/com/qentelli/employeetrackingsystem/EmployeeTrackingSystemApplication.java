@@ -23,7 +23,7 @@ public class EmployeeTrackingSystemApplication {
 	public CommandLineRunner seedAdmins(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 	    return args -> {
 	        List<User> admins = List.of(
-	            new User("superadmin@gmail.com", "Sarath11@", "Sarath", "Sarath", "EMP1001"),
+	            new User("superadmin@gmail.com", "Sarath11@", "Sarath", "Teneti", "EMP1001"),
 	            new User("superadmin2@gmail.com", "Madhu123@", "Madhu", "Marrapu", "EMP1002")
 	        );
 
