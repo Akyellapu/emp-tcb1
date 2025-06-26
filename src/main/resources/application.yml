@@ -1,0 +1,19 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: Employee-Tracking-System
+
+  datasource:
+    url: jdbc:postgresql://ep-super-pond-a8z4my7u-pooler.eastus2.azure.neon.tech:5432/emp-track?sslmode=require
+    username: emp-track_owner
+    password: npg_gtXW9CpL0RiD
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  main:
+    allow-circular-references: true
