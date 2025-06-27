@@ -1,7 +1,6 @@
 package com.qentelli.employeetrackingsystem.serviceImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -9,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.qentelli.employeetrackingsystem.entity.Account;
 import com.qentelli.employeetrackingsystem.entity.Project;
+import com.qentelli.employeetrackingsystem.exception.AccountNotFoundException;
 import com.qentelli.employeetrackingsystem.models.client.request.ProjectDTO;
 import com.qentelli.employeetrackingsystem.repository.AccountRepository;
 import com.qentelli.employeetrackingsystem.repository.ProjectRepository;
@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ProjectService {
+	
+	private static final String PROJECT_NOT_FOUND = "Project not found";
+	private static final String ACCOUNT_NOT_FOUND = "Account not found";
 
     private final ProjectRepository projectRepo;
     private final AccountRepository accountRepo;
@@ -27,7 +30,7 @@ public class ProjectService {
     public ProjectDTO create(ProjectDTO dto) {
         Project project = modelMapper.map(dto, Project.class);
         Account account = accountRepo.findById(dto.getAccountId())
-            .orElseThrow(() -> new RuntimeException("Account not found"));
+            .orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND));
 
         project.setAccount(account);
         Project saved = projectRepo.save(project);
@@ -45,7 +48,7 @@ public class ProjectService {
     public List<ProjectDTO> getAll() {
         return projectRepo.findAll().stream()
             .map(p -> modelMapper.map(p, ProjectDTO.class))
-            .collect(Collectors.toList());
+            .toList();
     }
 
  

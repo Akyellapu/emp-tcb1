@@ -7,5 +7,7 @@ import com.qentelli.employeetrackingsystem.entity.Account;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account,Integer> {
+	
+	boolean existsByAccountName(String accountName);
 
 }

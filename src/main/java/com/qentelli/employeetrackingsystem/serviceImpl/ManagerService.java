@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.qentelli.employeetrackingsystem.entity.Manager;
 import com.qentelli.employeetrackingsystem.entity.Project;
+import com.qentelli.employeetrackingsystem.exception.ManagerNotFoundException;
 import com.qentelli.employeetrackingsystem.models.client.request.ManagerDTO;
 import com.qentelli.employeetrackingsystem.repository.ManagerRepository;
 import com.qentelli.employeetrackingsystem.repository.ProjectRepository;
@@ -18,64 +19,56 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ManagerService {
 
-    private final ManagerRepository managerRepo;
-    private final ProjectRepository projectRepo;
-    private final ModelMapper modelMapper;
+	private static final String MANAGER_NOT_FOUND = "Manager not found";
 
-   
-    public ManagerDTO create(ManagerDTO dto) {
-        Manager manager = modelMapper.map(dto, Manager.class);
+	private final ManagerRepository managerRepo;
+	private final ProjectRepository projectRepo;
+	private final ModelMapper modelMapper;
 
-        if (dto.getProjectIds() != null) {
-            List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
-            manager.setProjects(projects);
-        }
+	public ManagerDTO create(ManagerDTO dto) {
+		Manager manager = modelMapper.map(dto, Manager.class);
 
-        Manager saved = managerRepo.save(manager);
-        return modelMapper.map(saved, ManagerDTO.class);
-    }
+		if (dto.getProjectIds() != null) {
+			List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
+			manager.setProjects(projects);
+		}
 
-   
-    public ManagerDTO getById(Integer id) {
-        Manager manager = managerRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Manager not found"));
-        return modelMapper.map(manager, ManagerDTO.class);
-    }
+		Manager saved = managerRepo.save(manager);
+		return modelMapper.map(saved, ManagerDTO.class);
+	}
 
-   
-    public List<ManagerDTO> getAll() {
-        return managerRepo.findAll().stream()
-            .map(m -> modelMapper.map(m, ManagerDTO.class))
-            .toList();
-    }
+	public ManagerDTO getById(Integer id) {
+		Manager manager = managerRepo.findById(id).orElseThrow(() -> new ManagerNotFoundException(MANAGER_NOT_FOUND));
+		return modelMapper.map(manager, ManagerDTO.class);
+	}
 
-  
-    @Transactional
-    public ManagerDTO update(Integer id, ManagerDTO dto) {
-        Manager manager = managerRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Manager not found"));
+	public List<ManagerDTO> getAll() {
+		return managerRepo.findAll().stream().map(m -> modelMapper.map(m, ManagerDTO.class)).toList();
+	}
 
-        manager.setFirstName(dto.getFirstName());
-        manager.setLastName(dto.getLastName());
-        manager.setEmail(dto.getEmail());
-        manager.setEmployeeCode(dto.getEmployeeCode());
-        manager.setPassword(dto.getPassword());
-        manager.setConfirmPassword(dto.getConfirmPassword());
-        manager.setRole(dto.getRole());
-        manager.setTechStack(dto.getTechStack());
+	@Transactional
+	public ManagerDTO update(Integer id, ManagerDTO dto) {
+		Manager manager = managerRepo.findById(id).orElseThrow(() -> new ManagerNotFoundException(MANAGER_NOT_FOUND));
 
-        if (dto.getProjectIds() != null) {
-            List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
-            manager.setProjects(projects);
-        }
+		manager.setFirstName(dto.getFirstName());
+		manager.setLastName(dto.getLastName());
+		manager.setEmail(dto.getEmail());
+		manager.setEmployeeCode(dto.getEmployeeCode());
+		manager.setPassword(dto.getPassword());
+		manager.setConfirmPassword(dto.getConfirmPassword());
+		manager.setRole(dto.getRole());
+		manager.setTechStack(dto.getTechStack());
 
-        return modelMapper.map(manager, ManagerDTO.class);
-    }
+		if (dto.getProjectIds() != null) {
+			List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
+			manager.setProjects(projects);
+		}
 
+		return modelMapper.map(manager, ManagerDTO.class);
+	}
 
-    public void delete(Integer id) {
-        Manager manager = managerRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Manager not found"));
-        managerRepo.delete(manager);
-    }
+	public void delete(Integer id) {
+		Manager manager = managerRepo.findById(id).orElseThrow(() -> new ManagerNotFoundException(MANAGER_NOT_FOUND));
+		managerRepo.delete(manager);
+	}
 }

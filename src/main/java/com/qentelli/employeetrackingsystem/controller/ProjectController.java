@@ -18,7 +18,7 @@ import com.qentelli.employeetrackingsystem.serviceImpl.ProjectService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
