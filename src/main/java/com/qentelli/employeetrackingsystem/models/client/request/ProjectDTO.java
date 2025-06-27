@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProjectDTO {
-  
+  private Integer projectId;
     private String projectName;
     private Boolean softDelete = false;
     private LocalDateTime createdAt;
