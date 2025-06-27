@@ -6,7 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.qentelli.employeetrackingsystem.entity.Account;
+import com.qentelli.employeetrackingsystem.entity.Project;
 import com.qentelli.employeetrackingsystem.models.client.request.AccountDetailsDto;
+import com.qentelli.employeetrackingsystem.models.client.request.ProjectDTO;
 
 @Configuration
 public class ModelMapperConfig {
@@ -18,7 +20,7 @@ public class ModelMapperConfig {
               .setFieldMatchingEnabled(true)
               .setFieldAccessLevel(AccessLevel.PRIVATE);
 
-        // Safely skip audit fields during mapping
+        // Skip audit and ID fields for Account mapping
         mapper.typeMap(AccountDetailsDto.class, Account.class)
               .addMappings(m -> {
                   m.skip(Account::setAccountId);
@@ -26,6 +28,16 @@ public class ModelMapperConfig {
                   m.skip(Account::setCreatedBy);
                   m.skip(Account::setUpdatedAt);
                   m.skip(Account::setUpdatedBy);
+              });
+
+        // Skip audit and ID fields for Project mapping
+        mapper.typeMap(ProjectDTO.class, Project.class)
+              .addMappings(m -> {
+                  m.skip(Project::setProjectId);
+                  m.skip(Project::setCreatedAt);
+                  m.skip(Project::setCreatedBy);
+                  m.skip(Project::setUpdatedAt);
+                  m.skip(Project::setUpdatedBy);
               });
 
         return mapper;
