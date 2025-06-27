@@ -71,4 +71,19 @@ public class GlobalExceptionHandler {
         response.setErrorDescription(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+    
+    
+    @ExceptionHandler(DuplicateProjectException.class)
+    public ResponseEntity<AuthResponse<Object>> handleDuplicateProject(DuplicateProjectException ex) {
+        AuthResponse<Object> response = new AuthResponse<>(
+            HttpStatus.CONFLICT.value(),
+            RequestProcessStatus.FAILURE,
+            LocalDateTime.now(),
+            "project creation failed",
+            null
+        );
+        response.setErrorCode(HttpStatus.CONFLICT);
+        response.setErrorDescription(ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
 }
