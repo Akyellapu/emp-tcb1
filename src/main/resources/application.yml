@@ -13,7 +13,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Kolkata
     show-sql: true
+
+  jackson:
+    time-zone: Asia/Kolkata
 
   main:
     allow-circular-references: true

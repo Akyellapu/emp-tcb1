@@ -25,7 +25,7 @@ import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse2;
 import com.qentelli.employeetrackingsystem.serviceImpl.AccountService;
 
 @RestController
-@RequestMapping("/Account/")
+@RequestMapping("/Account")
 public class AccountController {
 
     @Autowired
@@ -61,7 +61,7 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<AuthResponse<AccountDetailsDto>> getAccountById(@PathVariable int id) {
         AccountDetailsDto dto = accountService.getAccountById(id);
 
@@ -75,7 +75,7 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateAccount(@PathVariable int id, @RequestBody AccountDetailsDto dto) {
         Account updated = accountService.updateAccount(id, dto);
         AccountDetailsDto mapped = modelMapper.map(updated, AccountDetailsDto.class);
@@ -88,7 +88,7 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> partialUpdateAccount(@PathVariable int id, @RequestBody AccountDetailsDto dto) {
         Account updated = accountService.partialUpdateAccount(id, dto);
         AccountDetailsDto mapped = modelMapper.map(updated, AccountDetailsDto.class);
