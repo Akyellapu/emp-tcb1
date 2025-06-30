@@ -1,5 +1,5 @@
 # Ignore root-level build and target folders
-/target/
+#/target/
 /build/
 
 # Un-ignore nested target and build folders inside src/main and src/test
