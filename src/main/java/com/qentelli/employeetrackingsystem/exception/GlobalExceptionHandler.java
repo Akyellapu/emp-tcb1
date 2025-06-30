@@ -3,11 +3,13 @@ package com.qentelli.employeetrackingsystem.exception;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -86,4 +88,24 @@ public class GlobalExceptionHandler {
         response.setErrorDescription(ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+    
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<AuthResponse<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        String errorMessages = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining(" | "));
+
+        AuthResponse<Object> response = new AuthResponse<>(
+                HttpStatus.BAD_REQUEST.value(),
+                RequestProcessStatus.FAILURE,
+                LocalDateTime.now(),
+                errorMessages,
+                null
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 }
