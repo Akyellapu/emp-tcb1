@@ -26,7 +26,7 @@ public class AuthController {
 	private final UserService userService;
 
 	@PostMapping("/login")
-	public ResponseEntity<AuthResponse<LoginUserResponse>> loginByUser( @RequestBody LoginUserRequest loginUserRequest) {
+	public ResponseEntity<AuthResponse<LoginUserResponse>> loginByUser(@Valid @RequestBody LoginUserRequest loginUserRequest) {
 		LoginUserResponse loginuser = userService.loginByEmail(loginUserRequest);
 
 		AuthResponse<LoginUserResponse> authResponse = new AuthResponse<>(
