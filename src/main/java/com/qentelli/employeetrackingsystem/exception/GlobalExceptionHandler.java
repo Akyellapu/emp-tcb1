@@ -1,27 +1,31 @@
 package com.qentelli.employeetrackingsystem.exception;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<AuthResponse<Object>> handleBadCredentials(BadCredentialsException ex) {
+        logger.warn("Authentication failed: {}", ex.getMessage());
+
         AuthResponse<Object> response = new AuthResponse<>(
             HttpStatus.UNAUTHORIZED.value(),
             RequestProcessStatus.FAILURE,
@@ -31,11 +35,14 @@ public class GlobalExceptionHandler {
         );
         response.setErrorCode(HttpStatus.UNAUTHORIZED);
         response.setErrorDescription("Invalid username or password");
+
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<AuthResponse<Object>> handleUsernameNotFound(UsernameNotFoundException ex) {
+        logger.warn("User not found: {}", ex.getMessage());
+
         AuthResponse<Object> response = new AuthResponse<>(
             HttpStatus.NOT_FOUND.value(),
             RequestProcessStatus.FAILURE,
@@ -45,23 +52,14 @@ public class GlobalExceptionHandler {
         );
         response.setErrorCode(HttpStatus.NOT_FOUND);
         response.setErrorDescription("User not found with the provided username");
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-    
-    @ExceptionHandler(ManagerNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleManagerNotFoundException(ManagerNotFoundException ex, HttpServletRequest request) {
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.NOT_FOUND.value());
-        response.put("error", HttpStatus.NOT_FOUND.getReasonPhrase());
-        response.put("message", ex.getMessage());
-        response.put("path", request.getRequestURI()); // Dynamically fetch the request path
 
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
-    
+
     @ExceptionHandler(DuplicateAccountException.class)
     public ResponseEntity<AuthResponse<Object>> handleDuplicateAccount(DuplicateAccountException ex) {
+        logger.info("Duplicate account creation attempt: {}", ex.getMessage());
+
         AuthResponse<Object> response = new AuthResponse<>(
             HttpStatus.CONFLICT.value(),
             RequestProcessStatus.FAILURE,
@@ -71,24 +69,44 @@ public class GlobalExceptionHandler {
         );
         response.setErrorCode(HttpStatus.CONFLICT);
         response.setErrorDescription(ex.getMessage());
+
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
-    
-    
+
     @ExceptionHandler(DuplicateProjectException.class)
     public ResponseEntity<AuthResponse<Object>> handleDuplicateProject(DuplicateProjectException ex) {
+        logger.info("Duplicate project creation attempt: {}", ex.getMessage());
+
         AuthResponse<Object> response = new AuthResponse<>(
             HttpStatus.CONFLICT.value(),
             RequestProcessStatus.FAILURE,
             LocalDateTime.now(),
-            "project creation failed",
+            "Project creation failed",
             null
         );
         response.setErrorCode(HttpStatus.CONFLICT);
         response.setErrorDescription(ex.getMessage());
+
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
-    
+
+    @ExceptionHandler(ManagerNotFoundException.class)
+    public ResponseEntity<AuthResponse<Object>> handleManagerNotFoundException(ManagerNotFoundException ex, HttpServletRequest request) {
+        logger.warn("Manager not found: {}", ex.getMessage());
+
+        AuthResponse<Object> response = new AuthResponse<>(
+            HttpStatus.NOT_FOUND.value(),
+            RequestProcessStatus.FAILURE,
+            LocalDateTime.now(),
+            "Manager not found for request path: " + request.getRequestURI(),
+            null
+        );
+        response.setErrorCode(HttpStatus.NOT_FOUND);
+        response.setErrorDescription(ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<AuthResponse<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
         String errorMessages = ex.getBindingResult()
@@ -97,6 +115,8 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .collect(Collectors.joining(" | "));
 
+        logger.debug("Validation failed: {}", errorMessages);
+
         AuthResponse<Object> response = new AuthResponse<>(
                 HttpStatus.BAD_REQUEST.value(),
                 RequestProcessStatus.FAILURE,
@@ -104,8 +124,26 @@ public class GlobalExceptionHandler {
                 errorMessages,
                 null
         );
+        response.setErrorCode(HttpStatus.BAD_REQUEST);
+        response.setErrorDescription("Validation failure");
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<AuthResponse<Object>> handleGenericException(Exception ex) {
+        logger.error("Unexpected error occurred", ex);
+
+        AuthResponse<Object> response = new AuthResponse<>(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                RequestProcessStatus.FAILURE,
+                LocalDateTime.now(),
+                "An unexpected error occurred",
+                null
+        );
+        response.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR);
+        response.setErrorDescription(ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

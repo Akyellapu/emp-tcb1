@@ -24,6 +24,7 @@ import com.qentelli.employeetrackingsystem.models.client.request.AccountDetailsD
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
 import com.qentelli.employeetrackingsystem.serviceImpl.AccountService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -37,7 +38,7 @@ public class AccountController {
 	private final ModelMapper modelMapper;
 
 	@PostMapping
-	public ResponseEntity<AuthResponse<AccountDetailsDto>> createAccount(@RequestBody AccountDetailsDto accountDto) {
+	public ResponseEntity<AuthResponse<AccountDetailsDto>> createAccount(@Valid @RequestBody AccountDetailsDto accountDto) {
 		logger.info("Creating new account with name: {}", accountDto.getAccountName());
 		Account newAccount = accountService.createAccount(accountDto);
 		AccountDetailsDto responseDto = modelMapper.map(newAccount, AccountDetailsDto.class);

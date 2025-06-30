@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,12 +16,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProjectDTO {
-  private Integer projectId;
-    private String projectName;
-    private Boolean softDelete = false;
-    private LocalDateTime createdAt;
-    private String createdBy;
-    private LocalDateTime updatedAt;
-    private String updatedBy;
-    private Integer accountId;
+	private Integer projectId;
+
+	@NotBlank(message = "Project name is required")
+	@Size(max = 20, message = "Project name must not exceed 20 characters")
+	private String projectName;
+	private Boolean softDelete = false;
+	private LocalDateTime createdAt;
+	private String createdBy;
+	private LocalDateTime updatedAt;
+	private String updatedBy;
+	@NotNull(message = "Account ID is required")
+	private Integer accountId;
 }
