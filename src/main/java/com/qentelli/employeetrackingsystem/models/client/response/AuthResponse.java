@@ -9,24 +9,43 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.qentelli.employeetrackingsystem.exception.RequestProcessStatus;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(Include.NON_EMPTY)
 public class AuthResponse<T> {
 
-   String code;
-   RequestProcessStatus statusType;
-   private String message;
-   private T data;
-   LocalDateTime timestamp;
-   HttpStatusCode errorCode;
-   String errorDescription;
-   
-   public AuthResponse(Integer code,RequestProcessStatus statusType,LocalDateTime timestamp,String message, T data) {
-	   this.code=code.toString();
-	   this.statusType= statusType;
-	   this.timestamp = timestamp;
-	   this.message = message;
-	   this.data = data;
-   }
+    private String code;
+    private RequestProcessStatus statusType;
+    private String message;
+    private T data;
+    private LocalDateTime timestamp;
+    private HttpStatusCode errorCode;
+    private String errorDescription;
+
+    // Optional constructors for flexibility
+    public AuthResponse(Integer code, RequestProcessStatus statusType, String message) {
+        this.code = code.toString();
+        this.statusType = statusType;
+        this.message = message;
+    }
+
+    public AuthResponse(Integer code, RequestProcessStatus statusType, LocalDateTime timestamp, String message, T data) {
+        this.code = code.toString();
+        this.statusType = statusType;
+        this.timestamp = timestamp;
+        this.message = message;
+        this.data = data;
+    }
+
+    public AuthResponse(Integer code, RequestProcessStatus statusType, String message, HttpStatusCode errorCode, String errorDescription) {
+        this.code = code.toString();
+        this.statusType = statusType;
+        this.message = message;
+        this.errorCode = errorCode;
+        this.errorDescription = errorDescription;
+    }
 }

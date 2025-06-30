@@ -13,7 +13,6 @@ import com.qentelli.employeetrackingsystem.exception.DuplicateProjectException;
 import com.qentelli.employeetrackingsystem.exception.RequestProcessStatus;
 import com.qentelli.employeetrackingsystem.models.client.request.ProjectDTO;
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
-import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse2;
 import com.qentelli.employeetrackingsystem.serviceImpl.ProjectService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class ProjectController {
 
 		logger.debug("Project created: {}", createdProject);
 		AuthResponse<ProjectDTO> response = new AuthResponse<>(HttpStatus.CREATED.value(), RequestProcessStatus.SUCCESS,
-				LocalDateTime.now(), "Project created successfully", createdProject);
+				 "Project created successfully");
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
@@ -72,7 +71,7 @@ public class ProjectController {
 
 		logger.debug("Project updated: {}", updatedProject);
 		AuthResponse<ProjectDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-				LocalDateTime.now(), "Project updated successfully", updatedProject);
+				 "Project updated successfully");
 
 		return ResponseEntity.ok(response);
 	}
@@ -85,18 +84,18 @@ public class ProjectController {
 
 		logger.debug("Project partially updated: {}", partiallyUpdatedProject);
 		AuthResponse<ProjectDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-				LocalDateTime.now(), "Project partially updated successfully", partiallyUpdatedProject);
+				 "Project partially updated successfully");
 
 		return ResponseEntity.ok(response);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<AuthResponse2<ProjectDTO>> deleteProject(@PathVariable Integer id) {
+	public ResponseEntity<AuthResponse<ProjectDTO>> deleteProject(@PathVariable Integer id) {
 		logger.info("Deleting project with ID: {}", id);
 		projectService.delete(id);
 
 		logger.debug("Project with ID {} deleted", id);
-		AuthResponse2<ProjectDTO> response = new AuthResponse2<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+		AuthResponse<ProjectDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
 				"Project deleted successfully");
 
 		return ResponseEntity.ok(response);

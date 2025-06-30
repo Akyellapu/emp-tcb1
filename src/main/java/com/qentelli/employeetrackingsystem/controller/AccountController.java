@@ -22,7 +22,6 @@ import com.qentelli.employeetrackingsystem.entity.Account;
 import com.qentelli.employeetrackingsystem.exception.RequestProcessStatus;
 import com.qentelli.employeetrackingsystem.models.client.request.AccountDetailsDto;
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
-import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse2;
 import com.qentelli.employeetrackingsystem.serviceImpl.AccountService;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,7 @@ public class AccountController {
 
 		logger.debug("Account created: {}", responseDto);
 		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.CREATED.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Account created successfully", responseDto);
+				RequestProcessStatus.SUCCESS, "Account created successfully");
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
@@ -83,7 +82,7 @@ public class AccountController {
 
 		logger.debug("Account updated: {}", responseDto);
 		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Account updated successfully", responseDto);
+				RequestProcessStatus.SUCCESS, "Account updated successfully");
 
 		return ResponseEntity.ok(response);
 	}
@@ -97,31 +96,30 @@ public class AccountController {
 
 		logger.debug("Account partially updated: {}", responseDto);
 		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Account partially updated successfully",
-				responseDto);
+				RequestProcessStatus.SUCCESS, "Account partially updated successfully");
 
 		return ResponseEntity.ok(response);
 	}
 
 	@DeleteMapping("/soft/{id}")
-	public ResponseEntity<AuthResponse2<AccountDetailsDto>> softDeleteAccount(@PathVariable int id) {
+	public ResponseEntity<AuthResponse<AccountDetailsDto>> softDeleteAccount(@PathVariable int id) {
 		logger.info("Soft deleting account with ID: {}", id);
 		accountService.softDeleteAccount(id);
 
 		logger.debug("Account soft deleted with ID: {}", id);
-		AuthResponse2<AccountDetailsDto> response = new AuthResponse2<>(HttpStatus.OK.value(),
+		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.OK.value(),
 				RequestProcessStatus.SUCCESS, "Account soft deleted successfully");
 
 		return ResponseEntity.ok(response);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<AuthResponse2<AccountDetailsDto>> deleteAccount(@PathVariable int id) {
+	public ResponseEntity<AuthResponse<AccountDetailsDto>> deleteAccount(@PathVariable int id) {
 		logger.info("Permanently deleting account with ID: {}", id);
 		accountService.deleteAccount(id);
 
 		logger.debug("Account permanently deleted with ID: {}", id);
-		AuthResponse2<AccountDetailsDto> response = new AuthResponse2<>(HttpStatus.OK.value(),
+		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.OK.value(),
 				RequestProcessStatus.SUCCESS, "Account permanently deleted successfully");
 
 		return ResponseEntity.ok(response);
