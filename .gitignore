@@ -1,9 +1,26 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Ignore root-level build and target folders
+/target/
+/build/
 
+# Un-ignore nested target and build folders inside src/main and src/test
+!src/
+!src/**/
+!src/main/
+!src/main/**/
+!src/main/**/target/
+!src/test/
+!src/test/**/
+!src/test/**/target/
+!src/main/**/build/
+!src/test/**/build/
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Documentation
+HELP.md
+
+# IDE settings
 ### STS ###
 .apt_generated
 .classpath
@@ -25,9 +42,6 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
 ### VS Code ###
 .vscode/
