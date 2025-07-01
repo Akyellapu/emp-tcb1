@@ -3,6 +3,7 @@ package com.qentelli.employeetrackingsystem.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,8 +30,9 @@ public class Person {
 
     private String firstName;
     private String lastName;
+    @Column(unique = true, nullable = false)
     private String email;
-
+    @Column(unique = true, nullable = false)
     private String employeeCode;
     private String password;
     private String confirmPassword;

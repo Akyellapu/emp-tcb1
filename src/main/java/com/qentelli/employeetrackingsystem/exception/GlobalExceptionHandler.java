@@ -72,6 +72,23 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
+    
+    @ExceptionHandler(DuplicatePersonException.class)
+    public ResponseEntity<AuthResponse<Object>> handleDuplicatePerson(DuplicatePersonException ex) {
+        logger.info("Duplicate person creation attempt: {}", ex.getMessage());
+
+        AuthResponse<Object> response = new AuthResponse<>(
+            HttpStatus.CONFLICT.value(),
+            RequestProcessStatus.FAILURE,
+            LocalDateTime.now(),
+            "person creation failed",
+            null
+        );
+        response.setErrorCode(HttpStatus.CONFLICT);
+        response.setErrorDescription(ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(DuplicateProjectException.class)
     public ResponseEntity<AuthResponse<Object>> handleDuplicateProject(DuplicateProjectException ex) {
@@ -90,15 +107,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(ManagerNotFoundException.class)
-    public ResponseEntity<AuthResponse<Object>> handleManagerNotFoundException(ManagerNotFoundException ex, HttpServletRequest request) {
-        logger.warn("Manager not found: {}", ex.getMessage());
+    @ExceptionHandler(PersonNotFoundException.class)
+    public ResponseEntity<AuthResponse<Object>> handleManagerNotFoundException(PersonNotFoundException ex, HttpServletRequest request) {
+        logger.warn("person not found: {}", ex.getMessage());
 
         AuthResponse<Object> response = new AuthResponse<>(
             HttpStatus.NOT_FOUND.value(),
             RequestProcessStatus.FAILURE,
             LocalDateTime.now(),
-            "Manager not found for request path: " + request.getRequestURI(),
+            "person not found for request path: " + request.getRequestURI(),
             null
         );
         response.setErrorCode(HttpStatus.NOT_FOUND);

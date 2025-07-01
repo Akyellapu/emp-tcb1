@@ -9,4 +9,8 @@ import com.qentelli.employeetrackingsystem.entity.Person;
 public interface PersonRepository extends JpaRepository<Person, Integer> {
     // You can add custom query methods here if needed, like:
     // Optional<Person> findByEmail(String email);
+	
+	 boolean existsByEmail(String email);
+	    boolean existsByEmployeeCode(String employeeCode);
+
 }

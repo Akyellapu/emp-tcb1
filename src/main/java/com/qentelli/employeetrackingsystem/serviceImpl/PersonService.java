@@ -1,7 +1,6 @@
 package com.qentelli.employeetrackingsystem.serviceImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -9,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.qentelli.employeetrackingsystem.entity.Person;
 import com.qentelli.employeetrackingsystem.entity.Project;
+import com.qentelli.employeetrackingsystem.exception.DuplicatePersonException;
 import com.qentelli.employeetrackingsystem.exception.PersonNotFoundException;
 import com.qentelli.employeetrackingsystem.models.client.request.PersonDTO;
 import com.qentelli.employeetrackingsystem.repository.PersonRepository;
@@ -27,6 +27,14 @@ public class PersonService {
 	private final ModelMapper modelMapper;
 
 	public PersonDTO create(PersonDTO dto) {
+
+		boolean exists = personRepo.existsByEmail(dto.getEmail())
+				|| personRepo.existsByEmployeeCode(dto.getEmployeeCode());
+
+		if (exists) {
+			throw new DuplicatePersonException("Person with this email or employee code already exists");
+		}
+
 		Person person = modelMapper.map(dto, Person.class);
 
 		if (dto.getProjectIds() != null) {
@@ -39,21 +47,17 @@ public class PersonService {
 	}
 
 	public PersonDTO getById(Integer id) {
-		Person person = personRepo.findById(id)
-			.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
+		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
 		return convertToDTO(person);
 	}
 
 	public List<PersonDTO> getAll() {
-		return personRepo.findAll().stream()
-			.map(this::convertToDTO)
-			.toList();
+		return personRepo.findAll().stream().map(this::convertToDTO).toList();
 	}
 
 	@Transactional
 	public PersonDTO update(Integer id, PersonDTO dto) {
-		Person person = personRepo.findById(id)
-			.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
+		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
 
 		person.setFirstName(dto.getFirstName());
 		person.setLastName(dto.getLastName());
@@ -73,8 +77,7 @@ public class PersonService {
 	}
 
 	public void delete(Integer id) {
-		Person person = personRepo.findById(id)
-			.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
+		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
 		personRepo.delete(person);
 	}
 
@@ -83,13 +86,9 @@ public class PersonService {
 
 		List<Project> projects = person.getProjects();
 		if (projects != null) {
-			dto.setProjectIds(projects.stream()
-				.map(Project::getProjectId)
-				.toList());
+			dto.setProjectIds(projects.stream().map(Project::getProjectId).toList());
 
-			dto.setProjectNames(projects.stream()
-				.map(Project::getProjectName)
-				.toList());
+			dto.setProjectNames(projects.stream().map(Project::getProjectName).toList());
 		}
 
 		return dto;
