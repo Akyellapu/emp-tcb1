@@ -46,13 +46,29 @@ public class ProjectService {
 		return modelMapper.map(saved, ProjectDTO.class);
 	}
 
+	
+	
 	public ProjectDTO getById(Integer id) {
-		Project project = projectRepo.findById(id).orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
-		return modelMapper.map(project, ProjectDTO.class);
+	    Project project = projectRepo.findById(id)
+	        .orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
+
+	    ProjectDTO dto = modelMapper.map(project, ProjectDTO.class);
+	    if (project.getAccount() != null) {
+	        dto.setAccountName(project.getAccount().getAccountName());
+	    }
+
+	    return dto;
 	}
 
+	
 	public List<ProjectDTO> getAll() {
-		return projectRepo.findAll().stream().map(p -> modelMapper.map(p, ProjectDTO.class)).toList();
+	    List<Project> projects = projectRepo.findAll();
+
+	    return projects.stream().map(project -> {
+	        ProjectDTO dto = modelMapper.map(project, ProjectDTO.class);
+	        dto.setAccountName(project.getAccount().getAccountName());
+	        return dto;
+	    }).toList();
 	}
 
 	@Transactional
@@ -60,7 +76,7 @@ public class ProjectService {
 		Project project = projectRepo.findById(id).orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 
 		project.setProjectName(dto.getProjectName());
-		project.setSoftDelete(dto.getSoftDelete());
+		//project.setSoftDelete(dto.getSoftDelete());
 		project.setUpdatedAt(LocalDateTime.now());
 		project.setUpdatedBy(getAuthenticatedUserFullName());
 
@@ -97,6 +113,13 @@ public class ProjectService {
 		Project project = projectRepo.findById(id).orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 		projectRepo.delete(project);
 	}
+	
+	public Project softDeleteProject(int id) {
+        Project project = projectRepo.findById(id)
+                .orElseThrow(() -> new ProjectNotFoundException("Project not found"));
+        project.setSoftDelete(true);
+        return projectRepo.save(project);
+    }
 
 	private String getAuthenticatedUserFullName() {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();

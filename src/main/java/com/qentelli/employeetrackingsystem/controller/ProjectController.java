@@ -97,6 +97,17 @@ public class ProjectController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	@DeleteMapping("/softDeleteProject/{id}")
+    public ResponseEntity<?> softDeleteProject(@PathVariable int id) {
+        projectService.softDeleteProject(id);
+        AuthResponse<ProjectDTO> authResponse = new AuthResponse<>(
+                HttpStatus.OK.value(),
+                RequestProcessStatus.SUCCESS,
+                "Project soft deleted successfully"
+        );
+        return ResponseEntity.ok(authResponse);
+    }
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<AuthResponse<ProjectDTO>> deleteProject(@PathVariable Integer id) {
