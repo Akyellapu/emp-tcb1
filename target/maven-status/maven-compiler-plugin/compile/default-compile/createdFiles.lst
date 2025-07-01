@@ -1,9 +1,12 @@
 com\qentelli\employeetrackingsystem\entity\User.class
 com\qentelli\employeetrackingsystem\models\client\request\ProjectDTO.class
 com\qentelli\employeetrackingsystem\models\client\response\UserDtoResponse.class
+com\qentelli\employeetrackingsystem\entity\Person.class
 com\qentelli\employeetrackingsystem\exception\RequestProcessStatus.class
 com\qentelli\employeetrackingsystem\repository\ManagerRepository.class
 com\qentelli\employeetrackingsystem\exception\DuplicateAccountException.class
+com\qentelli\employeetrackingsystem\repository\PersonRepository.class
+com\qentelli\employeetrackingsystem\serviceImpl\PersonService.class
 com\qentelli\employeetrackingsystem\controller\AccountController.class
 com\qentelli\employeetrackingsystem\config\JwtFilter.class
 com\qentelli\employeetrackingsystem\config\SecurityConfig.class
@@ -11,6 +14,7 @@ com\qentelli\employeetrackingsystem\serviceImpl\ManagerService.class
 com\qentelli\employeetrackingsystem\exception\GlobalExceptionHandler.class
 com\qentelli\employeetrackingsystem\entity\Account.class
 com\qentelli\employeetrackingsystem\entity\WeeklySummary.class
+com\qentelli\employeetrackingsystem\models\client\request\PersonDTO.class
 com\qentelli\employeetrackingsystem\models\client\response\ProjectDtoResponse.class
 com\qentelli\employeetrackingsystem\serviceImpl\ProjectService.class
 com\qentelli\employeetrackingsystem\repository\UserRepository.class
@@ -19,6 +23,7 @@ com\qentelli\employeetrackingsystem\exception\InvalidInputDataException.class
 com\qentelli\employeetrackingsystem\serviceImpl\AccountService.class
 com\qentelli\employeetrackingsystem\config\JpaAuditConfig.class
 com\qentelli\employeetrackingsystem\exception\ManagerNotFoundException.class
+com\qentelli\employeetrackingsystem\exception\PersonNotFoundException.class
 com\qentelli\employeetrackingsystem\entity\ViewReports.class
 com\qentelli\employeetrackingsystem\exception\ProjectNotFoundException.class
 com\qentelli\employeetrackingsystem\entity\Manager.class
@@ -35,6 +40,7 @@ com\qentelli\employeetrackingsystem\models\client\request\LoginUserRequest.class
 com\qentelli\employeetrackingsystem\entity\TaskStatus.class
 com\qentelli\employeetrackingsystem\EmployeeTrackingSystemApplication.class
 com\qentelli\employeetrackingsystem\models\client\response\LoginUserResponse.class
+com\qentelli\employeetrackingsystem\controller\PersonController.class
 com\qentelli\employeetrackingsystem\serviceImpl\UserService.class
 com\qentelli\employeetrackingsystem\controller\AuthController.class
 com\qentelli\employeetrackingsystem\config\AuditorAwareImpl.class

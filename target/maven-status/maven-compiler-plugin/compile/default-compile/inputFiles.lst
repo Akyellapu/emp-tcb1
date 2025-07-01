@@ -7,11 +7,13 @@ C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\e
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\AccountController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\AuthController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\ManagerController.java
+C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\PersonController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\ProjectController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\TechStackController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\EmployeeTrackingSystemApplication.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Account.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Manager.java
+C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Person.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Project.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Roles.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Task.java
@@ -27,6 +29,7 @@ C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\e
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\exception\GlobalExceptionHandler.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\exception\InvalidInputDataException.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\exception\ManagerNotFoundException.java
+C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\exception\PersonNotFoundException.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\exception\ProjectNotFoundException.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\exception\RequestProcessStatus.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\exception\ResourceNotFoundException.java
@@ -37,6 +40,7 @@ C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\e
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\request\DailyUpdateDto.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\request\LoginUserRequest.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\request\ManagerDTO.java
+C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\request\PersonDTO.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\request\ProjectDTO.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\request\WeeklySummaryDto.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\response\AuthResponse.java
@@ -46,10 +50,12 @@ C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\e
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\models\client\response\UserDtoResponse.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\AccountRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\ManagerRepository.java
+C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\PersonRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\ProjectRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\TechStackRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\UserRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\serviceImpl\AccountService.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\serviceImpl\ManagerService.java
+C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\serviceImpl\PersonService.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\serviceImpl\ProjectService.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\serviceImpl\UserService.java

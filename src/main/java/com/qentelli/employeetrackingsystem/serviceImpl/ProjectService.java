@@ -76,7 +76,7 @@ public class ProjectService {
 		Project project = projectRepo.findById(id).orElseThrow(() -> new RuntimeException(PROJECT_NOT_FOUND));
 
 		project.setProjectName(dto.getProjectName());
-		//project.setSoftDelete(dto.getSoftDelete());
+		project.setSoftDelete(dto.getSoftDelete());
 		project.setUpdatedAt(LocalDateTime.now());
 		project.setUpdatedBy(getAuthenticatedUserFullName());
 

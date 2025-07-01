@@ -21,7 +21,7 @@ public class ProjectDTO {
 	@NotBlank(message = "Project name is required")
 	@Size(max = 20, message = "Project name must not exceed 20 characters")
 	private String projectName;
-	//private Boolean softDelete = false;
+	private Boolean softDelete = false;
 	private LocalDateTime createdAt;
 	private String createdBy;
 	private LocalDateTime updatedAt;
