@@ -16,7 +16,6 @@ com\qentelli\employeetrackingsystem\models\client\request\PersonDTO.class
 com\qentelli\employeetrackingsystem\models\client\response\ProjectDtoResponse.class
 com\qentelli\employeetrackingsystem\serviceImpl\ProjectService.class
 com\qentelli\employeetrackingsystem\repository\UserRepository.class
-com\qentelli\employeetrackingsystem\controller\TechStackController.class
 com\qentelli\employeetrackingsystem\exception\InvalidInputDataException.class
 com\qentelli\employeetrackingsystem\serviceImpl\AccountService.class
 com\qentelli\employeetrackingsystem\config\JpaAuditConfig.class

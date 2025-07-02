@@ -9,7 +9,6 @@ C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\e
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\AuthController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\PersonController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\ProjectController.java
-C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\controller\TechStackController.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\EmployeeTrackingSystemApplication.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Account.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\entity\Person.java
@@ -49,7 +48,6 @@ C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\e
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\AccountRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\PersonRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\ProjectRepository.java
-C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\TechStackRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\repository\UserRepository.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\serviceImpl\AccountService.java
 C:\Users\anil.yellapu\emp-266\EmployeeTracking_Main\src\main\java\com\qentelli\employeetrackingsystem\serviceImpl\PersonService.java
