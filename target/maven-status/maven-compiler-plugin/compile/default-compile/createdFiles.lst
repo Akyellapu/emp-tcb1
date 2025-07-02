@@ -50,4 +50,5 @@ com\qentelli\employeetrackingsystem\entity\Project.class
 com\qentelli\employeetrackingsystem\exception\DuplicateProjectException.class
 com\qentelli\employeetrackingsystem\repository\AccountRepository.class
 com\qentelli\employeetrackingsystem\models\client\request\WeeklySummaryDto.class
+com\qentelli\employeetrackingsystem\config\FlexibleEnumListDeserializer.class
 com\qentelli\employeetrackingsystem\entity\Roles.class

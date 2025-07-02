@@ -112,7 +112,7 @@ public class ProjectController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<AuthResponse<ProjectDTO>> deleteProject(@PathVariable Integer id) {
 		logger.info("Deleting project with ID: {}", id);
-		projectService.delete(id);
+		projectService.deleteProject(id);
 
 		logger.debug("Project with ID {} deleted", id);
 		AuthResponse<ProjectDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,

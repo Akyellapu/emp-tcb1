@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.qentelli.employeetrackingsystem.entity.Roles;
 import com.qentelli.employeetrackingsystem.exception.RequestProcessStatus;
 import com.qentelli.employeetrackingsystem.models.client.request.PersonDTO;
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
@@ -33,15 +34,14 @@ public class PersonController {
 
 	private final PersonService personService;
 
-
 	@PostMapping
 	public ResponseEntity<AuthResponse<PersonDTO>> createPerson(@Valid @RequestBody PersonDTO personDto) {
 		logger.info("Creating new person: {}", personDto.getFirstName());
 		PersonDTO responseDto = personService.create(personDto);
 
 		logger.debug("Person created: {}", responseDto);
-		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.CREATED.value(),
-				RequestProcessStatus.SUCCESS, "Person created successfully");
+		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.CREATED.value(), RequestProcessStatus.SUCCESS,
+				"Person created successfully");
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
@@ -52,8 +52,8 @@ public class PersonController {
 		List<PersonDTO> persons = personService.getAll();
 
 		logger.debug("Persons fetched: {}", persons.size());
-		AuthResponse<List<PersonDTO>> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Persons fetched successfully", persons);
+		AuthResponse<List<PersonDTO>> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+				LocalDateTime.now(), "Persons fetched successfully", persons);
 
 		return ResponseEntity.ok(response);
 	}
@@ -64,8 +64,30 @@ public class PersonController {
 		PersonDTO dto = personService.getById(id);
 
 		logger.debug("Person fetched: {}", dto);
-		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Person fetched successfully", dto);
+		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+				LocalDateTime.now(), "Person fetched successfully", dto);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/role/{role}")
+	public ResponseEntity<AuthResponse<List<PersonDTO>>> getPersonsByRole(@PathVariable String role) {
+		logger.info("Fetching persons with role: {}", role);
+
+		Roles parsedRole;
+		try {
+			parsedRole = Roles.valueOf(role.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			logger.error("Invalid role provided: {}", role);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse<>(HttpStatus.BAD_REQUEST.value(),
+					RequestProcessStatus.FAILURE, LocalDateTime.now(), "Invalid role: " + role, null));
+		}
+
+		List<PersonDTO> persons = personService.getByRole(parsedRole);
+
+		logger.debug("Persons with role {} fetched: {}", role, persons.size());
+		AuthResponse<List<PersonDTO>> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+				LocalDateTime.now(), "Persons fetched successfully", persons);
 
 		return ResponseEntity.ok(response);
 	}
@@ -77,8 +99,8 @@ public class PersonController {
 		PersonDTO responseDto = personService.update(id, updatedDto);
 
 		logger.debug("Person updated: {}", responseDto);
-		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, "Person updated successfully");
+		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+				"Person updated successfully");
 
 		return ResponseEntity.ok(response);
 	}
@@ -89,8 +111,8 @@ public class PersonController {
 		personService.delete(id);
 
 		logger.debug("Person deleted: {}", id);
-		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, "Person deleted successfully");
+		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+				"Person deleted successfully");
 
 		return ResponseEntity.ok(response);
 	}

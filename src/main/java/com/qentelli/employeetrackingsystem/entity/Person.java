@@ -48,7 +48,7 @@ public class Person {
     )
     private List<Project> projects = new ArrayList<>();
 
-    @ElementCollection(targetClass = TechStack.class)
+    @ElementCollection()
     @Enumerated(EnumType.STRING)
     private List<TechStack> techStack = new ArrayList<>();
 }

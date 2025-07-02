@@ -9,23 +9,28 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.qentelli.employeetrackingsystem.entity.Account;
+import com.qentelli.employeetrackingsystem.entity.Person;
+import com.qentelli.employeetrackingsystem.entity.Project;
 import com.qentelli.employeetrackingsystem.entity.User;
 import com.qentelli.employeetrackingsystem.exception.AccountNotFoundException;
 import com.qentelli.employeetrackingsystem.exception.DuplicateAccountException;
 import com.qentelli.employeetrackingsystem.models.client.request.AccountDetailsDto;
 import com.qentelli.employeetrackingsystem.repository.AccountRepository;
+import com.qentelli.employeetrackingsystem.repository.PersonRepository;
+import com.qentelli.employeetrackingsystem.repository.ProjectRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AccountService {
 
 	private static final String ACCOUNT_NOT_FOUND = "Account not found with id: ";
 	private final AccountRepository accountRepository;
+	private final PersonRepository personRepository;
+	private final ProjectRepository projectRepository;
 	private final ModelMapper modelMapper;
 
-	public AccountService(AccountRepository accountRepository, ModelMapper modelMapper) {
-		this.accountRepository = accountRepository;
-		this.modelMapper = modelMapper;
-	}
 
 	// CREATE
 	public Account createAccount(AccountDetailsDto dto) {
@@ -93,12 +98,24 @@ public class AccountService {
 		return accountRepository.save(account);
 	}
 
-	// HARD DELETE
+	
 	public Account deleteAccount(Integer id) {
-		Account account = accountRepository.findById(id)
-				.orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
-		accountRepository.deleteById(id);
-		return account;
+	    Account account = accountRepository.findById(id)
+	            .orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
+
+	    // Disconnect projects from persons before deleting them
+	    if (account.getProjects() != null) {
+	        for (Project project : account.getProjects()) {
+	            List<Person> linkedPersons = personRepository.findByProjectsContaining(project);
+	            for (Person person : linkedPersons) {
+	                person.getProjects().remove(project);
+	            }
+	            personRepository.saveAll(linkedPersons); // Persist changes
+	            projectRepository.delete(project);        // Now safe to delete
+	        }
+	    }
+	    accountRepository.delete(account); // Delete the account itself
+	    return account;
 	}
 
 	// Extracted method for full name resolution

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.qentelli.employeetrackingsystem.entity.Person;
 import com.qentelli.employeetrackingsystem.entity.Project;
+import com.qentelli.employeetrackingsystem.entity.Roles;
 import com.qentelli.employeetrackingsystem.exception.DuplicatePersonException;
 import com.qentelli.employeetrackingsystem.exception.PersonNotFoundException;
 import com.qentelli.employeetrackingsystem.models.client.request.PersonDTO;
@@ -53,6 +54,11 @@ public class PersonService {
 
 	public List<PersonDTO> getAll() {
 		return personRepo.findAll().stream().map(this::convertToDTO).toList();
+	}
+	
+	public List<PersonDTO> getByRole(Roles role) {
+	    List<Person> persons = personRepo.findByRole(role);
+	    return persons.stream().map(this::convertToDTO).toList();
 	}
 
 	@Transactional

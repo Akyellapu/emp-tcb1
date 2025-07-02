@@ -3,6 +3,8 @@ package com.qentelli.employeetrackingsystem.models.client.request;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.qentelli.employeetrackingsystem.config.FlexibleEnumListDeserializer;
 import com.qentelli.employeetrackingsystem.entity.Roles;
 import com.qentelli.employeetrackingsystem.entity.TechStack;
 
@@ -23,6 +25,7 @@ public class PersonDTO {
     private String password;
     private String confirmPassword;
     private Roles role;
+    @JsonDeserialize(using = FlexibleEnumListDeserializer.class)
     private List<TechStack> techStack;
     
     private List<Integer> projectIds;   // Existing mapping by ID
