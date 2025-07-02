@@ -19,6 +19,7 @@ import com.qentelli.employeetrackingsystem.repository.AccountRepository;
 import com.qentelli.employeetrackingsystem.repository.PersonRepository;
 import com.qentelli.employeetrackingsystem.repository.ProjectRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -98,8 +99,8 @@ public class AccountService {
 		return accountRepository.save(account);
 	}
 
-	
-	public Account deleteAccount(Integer id) {
+	@Transactional
+	public void deleteAccount(Integer id) {
 	    Account account = accountRepository.findById(id)
 	            .orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
 
@@ -115,7 +116,6 @@ public class AccountService {
 	        }
 	    }
 	    accountRepository.delete(account); // Delete the account itself
-	    return account;
 	}
 
 	// Extracted method for full name resolution

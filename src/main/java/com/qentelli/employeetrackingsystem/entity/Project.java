@@ -38,9 +38,7 @@ public class Project {
     private String createdBy;
     private LocalDateTime updatedAt;
     private String updatedBy;
-    
-    
-    
+          
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", referencedColumnName = "accountId")
     private Account account;

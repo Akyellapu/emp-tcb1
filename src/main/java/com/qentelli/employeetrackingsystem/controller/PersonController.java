@@ -108,7 +108,7 @@ public class PersonController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<AuthResponse<PersonDTO>> deletePerson(@PathVariable int id) {
 		logger.info("Deleting person with ID: {}", id);
-		personService.delete(id);
+		personService.deletePersonById(id);
 
 		logger.debug("Person deleted: {}", id);
 		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,

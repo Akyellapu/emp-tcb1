@@ -55,15 +55,15 @@ public class PersonService {
 	public List<PersonDTO> getAll() {
 		return personRepo.findAll().stream().map(this::convertToDTO).toList();
 	}
-	
+
 	public List<PersonDTO> getByRole(Roles role) {
-	    List<Person> persons = personRepo.findByRole(role);
-	    return persons.stream().map(this::convertToDTO).toList();
+		List<Person> persons = personRepo.findByRole(role);
+		return persons.stream().map(this::convertToDTO).toList();
 	}
 
 	@Transactional
 	public PersonDTO update(Integer id, PersonDTO dto) {
-		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
+		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND + "with id : "+id));
 
 		person.setFirstName(dto.getFirstName());
 		person.setLastName(dto.getLastName());
@@ -82,8 +82,17 @@ public class PersonService {
 		return convertToDTO(person);
 	}
 
-	public void delete(Integer id) {
-		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
+	@Transactional
+	public void deletePersonById(Integer personId) {
+		Person person = personRepo.findById(personId)
+				.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND + "with id :" + personId));
+
+		// Unlink projects
+		person.getProjects().clear();
+
+		// You can also optionally clear techStack if needed:
+		person.getTechStack().clear();
+
 		personRepo.delete(person);
 	}
 
