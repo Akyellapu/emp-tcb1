@@ -12,7 +12,6 @@ import com.qentelli.employeetrackingsystem.entity.Roles;
 import com.qentelli.employeetrackingsystem.exception.DuplicatePersonException;
 import com.qentelli.employeetrackingsystem.exception.PersonNotFoundException;
 import com.qentelli.employeetrackingsystem.models.client.request.PersonDTO;
-import com.qentelli.employeetrackingsystem.models.client.response.PersonResponseDTO;
 import com.qentelli.employeetrackingsystem.repository.PersonRepository;
 import com.qentelli.employeetrackingsystem.repository.ProjectRepository;
 
@@ -51,21 +50,21 @@ public class PersonService {
 		Person saved = personRepo.save(person);
 		return convertToDTO(saved);
 	}
-	public List<PersonResponseDTO> getAllResponses() {
+	public List<PersonDTO> getAllResponses() {
 	    return personRepo.findAll().stream()
-	        .map(this::convertToResponseDTO)
+	        .map(this::convertToDTO)
 	        .toList();
 	}
 
-	public PersonResponseDTO getByIdResponse(Integer id) {
+	public PersonDTO getByIdResponse(Integer id) {
 	    return personRepo.findById(id)
-	        .map(this::convertToResponseDTO)
+	        .map(this::convertToDTO)
 	        .orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
 	}
 
-	public List<PersonResponseDTO> getByRoleResponse(Roles role) {
+	public List<PersonDTO> getByRoleResponse(Roles role) {
 	    return personRepo.findByRole(role).stream()
-	        .map(this::convertToResponseDTO)
+	        .map(this::convertToDTO)
 	        .toList();
 	}
 
@@ -102,11 +101,8 @@ public class PersonService {
 		Person person = personRepo.findById(personId)
 				.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND + "with id :" + personId));
 
-		// Unlink projects
+	
 		person.getProjects().clear();
-
-//		// You can also optionally clear techStack if needed:
-//		person.getTechStack().clear();
 
 		personRepo.delete(person);
 	}
@@ -124,20 +120,5 @@ public class PersonService {
 		return dto;
 	}
 	
-	private PersonResponseDTO convertToResponseDTO(Person person) {
-	    List<String> projectNames = person.getProjects() != null
-	            ? person.getProjects().stream().map(Project::getProjectName).toList()
-	            : List.of();
-
-	    return new PersonResponseDTO(
-	        person.getPersonId(),
-	        person.getFirstName(),
-	        person.getLastName(),
-	        person.getEmail(),
-	        person.getEmployeeCode(),
-	        person.getRole(),
-	        person.getTechStack(),
-	        projectNames
-	    );
-	}
+	
 }
