@@ -5,6 +5,7 @@ com\qentelli\employeetrackingsystem\entity\Person.class
 com\qentelli\employeetrackingsystem\exception\RequestProcessStatus.class
 com\qentelli\employeetrackingsystem\exception\DuplicateAccountException.class
 com\qentelli\employeetrackingsystem\repository\PersonRepository.class
+com\qentelli\employeetrackingsystem\config\FlexibleTechStackDeserializer.class
 com\qentelli\employeetrackingsystem\serviceImpl\PersonService.class
 com\qentelli\employeetrackingsystem\controller\AccountController.class
 com\qentelli\employeetrackingsystem\config\JwtFilter.class
@@ -38,6 +39,7 @@ com\qentelli\employeetrackingsystem\controller\PersonController.class
 com\qentelli\employeetrackingsystem\serviceImpl\UserService.class
 com\qentelli\employeetrackingsystem\exception\DuplicatePersonException.class
 com\qentelli\employeetrackingsystem\controller\AuthController.class
+com\qentelli\employeetrackingsystem\models\client\response\PersonResponseDTO.class
 com\qentelli\employeetrackingsystem\config\AuditorAwareImpl.class
 com\qentelli\employeetrackingsystem\controller\ProjectController.class
 com\qentelli\employeetrackingsystem\exception\ResourceNotFoundException.class

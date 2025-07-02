@@ -37,7 +37,6 @@ public class Person {
     private String password;
     private String confirmPassword;
 
-    @Enumerated(EnumType.STRING)
     private Roles role;
 
     @ManyToMany
@@ -48,7 +47,6 @@ public class Person {
     )
     private List<Project> projects = new ArrayList<>();
 
-    @ElementCollection()
     @Enumerated(EnumType.STRING)
-    private List<TechStack> techStack = new ArrayList<>();
+    private TechStack techStack;
 }

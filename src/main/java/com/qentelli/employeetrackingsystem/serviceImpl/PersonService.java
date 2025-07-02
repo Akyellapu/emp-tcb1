@@ -12,6 +12,7 @@ import com.qentelli.employeetrackingsystem.entity.Roles;
 import com.qentelli.employeetrackingsystem.exception.DuplicatePersonException;
 import com.qentelli.employeetrackingsystem.exception.PersonNotFoundException;
 import com.qentelli.employeetrackingsystem.models.client.request.PersonDTO;
+import com.qentelli.employeetrackingsystem.models.client.response.PersonResponseDTO;
 import com.qentelli.employeetrackingsystem.repository.PersonRepository;
 import com.qentelli.employeetrackingsystem.repository.ProjectRepository;
 
@@ -42,23 +43,30 @@ public class PersonService {
 			List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
 			person.setProjects(projects);
 		}
+		
+		 if (dto.getTechStack() != null) {
+	            person.setTechStack(dto.getTechStack());
+	        }
 
 		Person saved = personRepo.save(person);
 		return convertToDTO(saved);
 	}
-
-	public PersonDTO getById(Integer id) {
-		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
-		return convertToDTO(person);
+	public List<PersonResponseDTO> getAllResponses() {
+	    return personRepo.findAll().stream()
+	        .map(this::convertToResponseDTO)
+	        .toList();
 	}
 
-	public List<PersonDTO> getAll() {
-		return personRepo.findAll().stream().map(this::convertToDTO).toList();
+	public PersonResponseDTO getByIdResponse(Integer id) {
+	    return personRepo.findById(id)
+	        .map(this::convertToResponseDTO)
+	        .orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
 	}
 
-	public List<PersonDTO> getByRole(Roles role) {
-		List<Person> persons = personRepo.findByRole(role);
-		return persons.stream().map(this::convertToDTO).toList();
+	public List<PersonResponseDTO> getByRoleResponse(Roles role) {
+	    return personRepo.findByRole(role).stream()
+	        .map(this::convertToResponseDTO)
+	        .toList();
 	}
 
 	@Transactional
@@ -72,14 +80,21 @@ public class PersonService {
 		person.setPassword(dto.getPassword());
 		person.setConfirmPassword(dto.getConfirmPassword());
 		person.setRole(dto.getRole());
-		person.setTechStack(dto.getTechStack());
+
+		
+        if (dto.getTechStack() != null) {
+            person.setTechStack(dto.getTechStack());
+        }
+
 
 		if (dto.getProjectIds() != null) {
 			List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
 			person.setProjects(projects);
 		}
 
-		return convertToDTO(person);
+		Person saved = personRepo.save(person);
+		return convertToDTO(saved);
+
 	}
 
 	@Transactional
@@ -90,8 +105,8 @@ public class PersonService {
 		// Unlink projects
 		person.getProjects().clear();
 
-		// You can also optionally clear techStack if needed:
-		person.getTechStack().clear();
+//		// You can also optionally clear techStack if needed:
+//		person.getTechStack().clear();
 
 		personRepo.delete(person);
 	}
@@ -107,5 +122,22 @@ public class PersonService {
 		}
 
 		return dto;
+	}
+	
+	private PersonResponseDTO convertToResponseDTO(Person person) {
+	    List<String> projectNames = person.getProjects() != null
+	            ? person.getProjects().stream().map(Project::getProjectName).toList()
+	            : List.of();
+
+	    return new PersonResponseDTO(
+	        person.getPersonId(),
+	        person.getFirstName(),
+	        person.getLastName(),
+	        person.getEmail(),
+	        person.getEmployeeCode(),
+	        person.getRole(),
+	        person.getTechStack(),
+	        projectNames
+	    );
 	}
 }
