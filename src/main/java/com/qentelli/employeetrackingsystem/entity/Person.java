@@ -36,7 +36,8 @@ public class Person {
     private String employeeCode;
     private String password;
     private String confirmPassword;
-
+    
+    @Enumerated(EnumType.STRING)
     private Roles role;
 
     @ManyToMany

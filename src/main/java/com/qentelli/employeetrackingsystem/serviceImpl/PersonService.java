@@ -29,26 +29,41 @@ public class PersonService {
 
 	public PersonDTO create(PersonDTO dto) {
 
-		boolean exists = personRepo.existsByEmail(dto.getEmail())
-				|| personRepo.existsByEmployeeCode(dto.getEmployeeCode());
+	    boolean exists = personRepo.existsByEmail(dto.getEmail())
+	            || personRepo.existsByEmployeeCode(dto.getEmployeeCode());
 
-		if (exists) {
-			throw new DuplicatePersonException("Person with this email or employee code already exists");
-		}
+	    if (exists) {
+	        throw new DuplicatePersonException("Person with this email or employee code already exists");
+	    }
 
-		Person person = modelMapper.map(dto, Person.class);
+	    Person person = modelMapper.map(dto, Person.class);
 
-		if (dto.getProjectIds() != null) {
-			List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
-			person.setProjects(projects);
-		}
-		
-		 if (dto.getTechStack() != null) {
-	            person.setTechStack(dto.getTechStack());
+	    // Strict project ID validation
+	    if (dto.getProjectIds() != null && !dto.getProjectIds().isEmpty()) {
+	        List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
+
+	        // Find which IDs are missing
+	        List<Integer> foundIds = projects.stream()
+	                .map(Project::getProjectId)
+	                .toList();
+
+	        List<Integer> missingIds = dto.getProjectIds().stream()
+	                .filter(id -> !foundIds.contains(id))
+	                .toList();
+
+	        if (!missingIds.isEmpty()) {
+	            throw new IllegalArgumentException("Invalid project IDs: " + missingIds);
 	        }
 
-		Person saved = personRepo.save(person);
-		return convertToDTO(saved);
+	        person.setProjects(projects);
+	    }
+
+	    if (dto.getTechStack() != null) {
+	        person.setTechStack(dto.getTechStack());
+	    }
+
+	    Person saved = personRepo.save(person);
+	    return convertToDTO(saved);
 	}
 	public List<PersonDTO> getAllResponses() {
 	    return personRepo.findAll().stream()
