@@ -85,23 +85,23 @@ public class PersonController {
 
 		return ResponseEntity.ok(response);
 	}
+
 	@GetMapping("/search/name")
 	public ResponseEntity<AuthResponse<List<PersonDTO>>> searchByName(@RequestParam String name) {
-	    logger.info("Searching for person(s) by name: {}", name);
-	    List<PersonDTO> results = personService.searchByName(name);
+		logger.info("Searching for person(s) by name: {}", name);
+		List<PersonDTO> results = personService.searchByName(name);
 
-	    HttpStatus status = results.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
-	    RequestProcessStatus processStatus = results.isEmpty() ? RequestProcessStatus.FAILURE : RequestProcessStatus.SUCCESS;
-	    String message = results.isEmpty() ? "No matching persons found" : "Persons fetched successfully";
+		HttpStatus status = results.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+		RequestProcessStatus processStatus = results.isEmpty() ? RequestProcessStatus.FAILURE
+				: RequestProcessStatus.SUCCESS;
+		String message = results.isEmpty() ? "No matching persons found" : "Persons fetched successfully";
 
-	    logger.debug("Search result count: {}", results.size());
-	    AuthResponse<List<PersonDTO>> response = new AuthResponse<>(
-	        status.value(), processStatus, LocalDateTime.now(), message, results
-	    );
+		logger.debug("Search result count: {}", results.size());
+		AuthResponse<List<PersonDTO>> response = new AuthResponse<>(status.value(), processStatus, LocalDateTime.now(),
+				message, results);
 
-	    return ResponseEntity.status(status).body(response);
+		return ResponseEntity.status(status).body(response);
 	}
-
 
 	@GetMapping("/role/{role}")
 	public ResponseEntity<AuthResponse<List<PersonDTO>>> getPersonsByRole(@PathVariable String role) {
@@ -123,6 +123,27 @@ public class PersonController {
 				LocalDateTime.now(), "Persons fetched successfully", persons);
 
 		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/project/{projectId}")
+	public ResponseEntity<AuthResponse<List<PersonDTO>>> getPersonsByProject(@PathVariable Integer projectId) {
+		logger.info("Fetching persons tagged to project ID: {}", projectId);
+
+		if (!personService.isProjectExists(projectId)) {
+			logger.warn("Project not found with ID: {}", projectId);
+			AuthResponse<List<PersonDTO>> errorResponse = new AuthResponse<>(HttpStatus.NOT_FOUND.value(),
+					RequestProcessStatus.FAILURE, LocalDateTime.now(), "Project with ID " + projectId + " not found",
+					null);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+		}
+
+		List<PersonDTO> persons = personService.getPersonsByProjectId(projectId);
+
+		logger.debug("Persons fetched for project ID {}: {}", projectId, persons.size());
+		AuthResponse<List<PersonDTO>> successResponse = new AuthResponse<>(HttpStatus.OK.value(),
+				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Persons fetched successfully", persons);
+
+		return ResponseEntity.ok(successResponse);
 	}
 
 	@PutMapping("/{id}")

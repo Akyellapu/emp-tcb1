@@ -99,6 +99,17 @@ public class PersonService {
 	public List<PersonDTO> getByRoleResponse(Roles role) {
 		return personRepo.findByRole(role).stream().map(this::convertToDTO).toList();
 	}
+	
+	public boolean isProjectExists(Integer projectId) {
+	    return projectRepo.existsById(projectId);
+	}
+
+	public List<PersonDTO> getPersonsByProjectId(Integer projectId) {
+	    List<Person> persons = personRepo.findByProjects_ProjectId(projectId);
+	    return persons.stream()
+	                  .map(this::convertToDTO) 
+	                  .toList();
+	}
 
 	@Transactional
 	public PersonDTO update(Integer id, PersonDTO dto) {
