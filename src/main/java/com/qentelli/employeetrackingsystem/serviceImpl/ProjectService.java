@@ -73,6 +73,16 @@ public class ProjectService {
 	        return dto;
 	    }).toList();
 	}
+	
+	 public List<ProjectDTO> searchProjectsByName(String name) {
+	        List<Project> projects = projectRepo.findByProjectNameIgnoreCase(name);
+	        return  projects.stream().map(project -> {
+		        ProjectDTO dto = modelMapper.map(project, ProjectDTO.class);
+		        dto.setAccountName(project.getAccount().getAccountName());
+		        return dto;
+		    }).toList();
+	    }
+
 
 	@Transactional
 	public ProjectDTO update(Integer id, ProjectDTO dto) {

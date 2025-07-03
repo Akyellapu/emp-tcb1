@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qentelli.employeetrackingsystem.exception.DuplicateProjectException;
@@ -71,6 +72,24 @@ public class ProjectController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	 @GetMapping("/search/name")
+	    public ResponseEntity<AuthResponse<List<ProjectDTO>>> searchProjectsByName(@RequestParam String name) {
+	        logger.info("Searching for projects with name: {}", name);
+	        List<ProjectDTO> results = projectService.searchProjectsByName(name);
+
+	        HttpStatus status = results.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+	        RequestProcessStatus processStatus = results.isEmpty() ? RequestProcessStatus.FAILURE : RequestProcessStatus.SUCCESS;
+	        String message = results.isEmpty() ? "No matching projects found" : "Projects fetched successfully";
+
+	        logger.debug("Projects found: {}", results.size());
+	        AuthResponse<List<ProjectDTO>> response = new AuthResponse<>(
+	            status.value(), processStatus, LocalDateTime.now(), message, results
+	        );
+
+	        return ResponseEntity.status(status).body(response);
+	    }
+
 
 	@PutMapping("/{id}")
 	public ResponseEntity<AuthResponse<ProjectDTO>> updateProject(@PathVariable Integer id,

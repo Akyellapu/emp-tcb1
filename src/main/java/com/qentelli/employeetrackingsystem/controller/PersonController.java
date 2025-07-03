@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qentelli.employeetrackingsystem.entity.Roles;
@@ -46,6 +47,21 @@ public class PersonController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
+	@PostMapping("/tag-projects")
+	public ResponseEntity<AuthResponse<String>> tagProjectsToEmployee(@RequestParam Integer personId,
+			@RequestBody List<Integer> projectIds) {
+
+		logger.info("Tagging projects to person with ID: {}", personId);
+
+		personService.tagProjectsToEmployee(personId, projectIds);
+
+		AuthResponse<String> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+				LocalDateTime.now(), "Project(s) tagged successfully",
+				"Projects tagged to person with ID: " + personId);
+
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping
 	public ResponseEntity<AuthResponse<List<PersonDTO>>> getAllPersons() {
 		logger.info("Fetching all persons");
@@ -69,6 +85,23 @@ public class PersonController {
 
 		return ResponseEntity.ok(response);
 	}
+	@GetMapping("/search/name")
+	public ResponseEntity<AuthResponse<List<PersonDTO>>> searchByName(@RequestParam String name) {
+	    logger.info("Searching for person(s) by name: {}", name);
+	    List<PersonDTO> results = personService.searchByName(name);
+
+	    HttpStatus status = results.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+	    RequestProcessStatus processStatus = results.isEmpty() ? RequestProcessStatus.FAILURE : RequestProcessStatus.SUCCESS;
+	    String message = results.isEmpty() ? "No matching persons found" : "Persons fetched successfully";
+
+	    logger.debug("Search result count: {}", results.size());
+	    AuthResponse<List<PersonDTO>> response = new AuthResponse<>(
+	        status.value(), processStatus, LocalDateTime.now(), message, results
+	    );
+
+	    return ResponseEntity.status(status).body(response);
+	}
+
 
 	@GetMapping("/role/{role}")
 	public ResponseEntity<AuthResponse<List<PersonDTO>>> getPersonsByRole(@PathVariable String role) {
@@ -107,14 +140,14 @@ public class PersonController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<AuthResponse<Void>> deletePerson(@PathVariable int id) {
-	    logger.info("Deleting person with ID: {}", id);
-	    personService.deletePersonById(id);
+		logger.info("Deleting person with ID: {}", id);
+		personService.deletePersonById(id);
 
-	    logger.debug("Person deleted: {}", id);
-	    AuthResponse<Void> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-	            "Person deleted successfully");
+		logger.debug("Person deleted: {}", id);
+		AuthResponse<Void> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+				"Person deleted successfully");
 
-	    return ResponseEntity.ok(response);
+		return ResponseEntity.ok(response);
 	}
 
 }

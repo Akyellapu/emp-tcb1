@@ -9,16 +9,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
+
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class DailyUpdateDto {
-    private Long id;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private String task;
-    private String status;
-    private List<String> keyAccomplishments;
-    private String employeeId;
+@Data
+public class WeeklySummaryRequest {
+    private int weekId;
+    private LocalDate weekStartDate;
+    private LocalDate weekEndDate;
+    private List<String> upcomingTasks;
+    private boolean status;
+    private List<Integer> projectIds;
 }

@@ -1,6 +1,7 @@
 package com.qentelli.employeetrackingsystem.serviceImpl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -29,63 +30,80 @@ public class PersonService {
 
 	public PersonDTO create(PersonDTO dto) {
 
-	    boolean exists = personRepo.existsByEmail(dto.getEmail())
-	            || personRepo.existsByEmployeeCode(dto.getEmployeeCode());
+		boolean exists = personRepo.existsByEmail(dto.getEmail())
+				|| personRepo.existsByEmployeeCode(dto.getEmployeeCode());
 
-	    if (exists) {
-	        throw new DuplicatePersonException("Person with this email or employee code already exists");
-	    }
+		if (exists) {
+			throw new DuplicatePersonException("Person with this email or employee code already exists");
+		}
 
-	    Person person = modelMapper.map(dto, Person.class);
+		Person person = modelMapper.map(dto, Person.class);
 
-	    // Strict project ID validation
-	    if (dto.getProjectIds() != null && !dto.getProjectIds().isEmpty()) {
-	        List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
+		// Strict project ID validation
+		if (dto.getProjectIds() != null && !dto.getProjectIds().isEmpty()) {
+			List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
 
-	        // Find which IDs are missing
-	        List<Integer> foundIds = projects.stream()
-	                .map(Project::getProjectId)
-	                .toList();
+			// Find which IDs are missing
+			List<Integer> foundIds = projects.stream().map(Project::getProjectId).toList();
 
-	        List<Integer> missingIds = dto.getProjectIds().stream()
-	                .filter(id -> !foundIds.contains(id))
-	                .toList();
+			List<Integer> missingIds = dto.getProjectIds().stream().filter(id -> !foundIds.contains(id)).toList();
 
-	        if (!missingIds.isEmpty()) {
-	            throw new IllegalArgumentException("Invalid project IDs: " + missingIds);
-	        }
+			if (!missingIds.isEmpty()) {
+				throw new IllegalArgumentException("Invalid project IDs: " + missingIds);
+			}
 
-	        person.setProjects(projects);
-	    }
+			person.setProjects(projects);
+		}
 
-	    if (dto.getTechStack() != null) {
-	        person.setTechStack(dto.getTechStack());
-	    }
+		if (dto.getTechStack() != null) {
+			person.setTechStack(dto.getTechStack());
+		}
 
-	    Person saved = personRepo.save(person);
-	    return convertToDTO(saved);
+		Person saved = personRepo.save(person);
+		return convertToDTO(saved);
 	}
-	public List<PersonDTO> getAllResponses() {
-	    return personRepo.findAll().stream()
+
+	public void tagProjectsToEmployee(Integer personId, List<Integer> projectIds) {
+		Person person = personRepo.findById(personId).orElseThrow(() -> new RuntimeException("Employee not found"));
+
+		List<Project> projectsToAdd = projectRepo.findAllById(projectIds);
+
+		// Filter out duplicates to avoid redundant entries
+		List<Project> existingProjects = person.getProjects();
+		for (Project p : projectsToAdd) {
+			if (!existingProjects.contains(p)) {
+				existingProjects.add(p);
+			}
+		}
+
+		personRepo.save(person);
+	}
+	
+	public List<PersonDTO> searchByName(String name) {
+	    List<Person> people = personRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
+	    return people.stream()
 	        .map(this::convertToDTO)
 	        .toList();
+	}
+
+
+	public List<PersonDTO> getAllResponses() {
+		return personRepo.findAll().stream().map(this::convertToDTO).toList();
 	}
 
 	public PersonDTO getByIdResponse(Integer id) {
-	    return personRepo.findById(id)
-	        .map(this::convertToDTO)
-	        .orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
+		return personRepo.findById(id).map(this::convertToDTO)
+				.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND));
 	}
 
 	public List<PersonDTO> getByRoleResponse(Roles role) {
-	    return personRepo.findByRole(role).stream()
-	        .map(this::convertToDTO)
-	        .toList();
+		return personRepo.findByRole(role).stream().map(this::convertToDTO).toList();
 	}
 
 	@Transactional
 	public PersonDTO update(Integer id, PersonDTO dto) {
-		Person person = personRepo.findById(id).orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND + "with id : "+id));
+		Person person = personRepo.findById(id)
+				.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND + "with id : " + id));
 
 		person.setFirstName(dto.getFirstName());
 		person.setLastName(dto.getLastName());
@@ -95,11 +113,9 @@ public class PersonService {
 		person.setConfirmPassword(dto.getConfirmPassword());
 		person.setRole(dto.getRole());
 
-		
-        if (dto.getTechStack() != null) {
-            person.setTechStack(dto.getTechStack());
-        }
-
+		if (dto.getTechStack() != null) {
+			person.setTechStack(dto.getTechStack());
+		}
 
 		if (dto.getProjectIds() != null) {
 			List<Project> projects = projectRepo.findAllById(dto.getProjectIds());
@@ -116,7 +132,6 @@ public class PersonService {
 		Person person = personRepo.findById(personId)
 				.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND + "with id :" + personId));
 
-	
 		person.getProjects().clear();
 
 		personRepo.delete(person);
@@ -134,6 +149,5 @@ public class PersonService {
 
 		return dto;
 	}
-	
-	
+
 }

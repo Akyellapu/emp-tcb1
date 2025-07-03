@@ -54,6 +54,14 @@ public class AccountService {
 				.orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
 		return modelMapper.map(account, AccountDetailsDto.class);
 	}
+	
+	 public List<AccountDetailsDto> searchAccountsByName(String name) {
+	        List<Account> accounts = accountRepository.findByAccountNameIgnoreCase(name);
+	        return accounts.stream()
+	                .map(acc -> modelMapper.map(acc, AccountDetailsDto.class))
+	                .toList();
+	    }
+
 
 	// FULL UPDATE
 	public Account updateAccount(Integer id, AccountDetailsDto dto) {

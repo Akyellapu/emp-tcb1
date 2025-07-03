@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.qentelli.employeetrackingsystem.entity.Account;
@@ -73,6 +74,25 @@ public class AccountController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	 @GetMapping("/search/name")
+	    public ResponseEntity<AuthResponse<List<AccountDetailsDto>>> searchAccountByName(@RequestParam String name) {
+	        logger.info("Searching for accounts with name: {}", name);
+
+	        List<AccountDetailsDto> results = accountService.searchAccountsByName(name);
+
+	        HttpStatus status = results.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK;
+	        RequestProcessStatus processStatus = results.isEmpty() ? RequestProcessStatus.FAILURE : RequestProcessStatus.SUCCESS;
+	        String message = results.isEmpty() ? "No matching accounts found" : "Accounts fetched successfully";
+
+	        logger.debug("Accounts found: {}", results.size());
+	        AuthResponse<List<AccountDetailsDto>> response = new AuthResponse<>(
+	            status.value(), processStatus, LocalDateTime.now(), message, results
+	        );
+
+	        return ResponseEntity.status(status).body(response);
+	    }
+
 
 	@PutMapping("/{id}")
 	public ResponseEntity<AuthResponse<AccountDetailsDto>> updateAccount(@PathVariable int id,

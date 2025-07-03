@@ -1,6 +1,7 @@
 package com.qentelli.employeetrackingsystem.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,8 +12,6 @@ import com.qentelli.employeetrackingsystem.entity.Roles;
 
 @Repository
 public interface PersonRepository extends JpaRepository<Person, Integer> {
-	// You can add custom query methods here if needed, like:
-	// Optional<Person> findByEmail(String email);
 
 	boolean existsByEmail(String email);
 
@@ -21,5 +20,10 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
 	List<Person> findByRole(Roles role);
 	
 	List<Person> findByProjectsContaining(Project project);
+	
+	Optional<Person> findByPersonId(Integer personId);
+	
+	List<Person> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstName, String lastName);
+	 
 
 }
