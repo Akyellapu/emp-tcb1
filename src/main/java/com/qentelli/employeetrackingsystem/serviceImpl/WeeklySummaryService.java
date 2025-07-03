@@ -3,7 +3,6 @@ package com.qentelli.employeetrackingsystem.serviceImpl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -21,14 +20,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WeeklySummaryService {
 
-	private WeeklySummaryRepository weeklySummaryRepository;
+	private static final String WEEKLY_SUMMARY_NOT_FOUND = "Weekly summary not found with id: ";
+	private static final String NO_PROJECTS_FOUND = "No projects found for given IDs";
+	private static final String WEEK = "WEEK";
 
-	private ProjectRepository projectRepository;
+	private final WeeklySummaryRepository weeklySummaryRepository;
+
+	private final ProjectRepository projectRepository;
 
 	public WeeklySummaryResponse createSummary(WeeklySummaryRequest request) {
 		List<Project> projects = projectRepository.findAllById(request.getProjectIds());
 		if (projects.isEmpty()) {
-			throw new ResourceNotFoundException("No projects found for given IDs");
+			throw new ResourceNotFoundException(NO_PROJECTS_FOUND);
 		}
 
 		WeeklySummary summary = new WeeklySummary();
@@ -52,10 +55,10 @@ public class WeeklySummaryService {
 
 	public WeeklySummaryResponse getSummaryById(Integer weekId) {
 		WeeklySummary summary = weeklySummaryRepository.findById(weekId)
-				.orElseThrow(() -> new ResourceNotFoundException("Weekly summary not found with id: " + weekId));
+				.orElseThrow(() -> new ResourceNotFoundException(WEEKLY_SUMMARY_NOT_FOUND + weekId));
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy");
-		String weekRange = "WEEK: " + summary.getWeekStartDate().format(formatter) + " To "
+		String weekRange = WEEK + summary.getWeekStartDate().format(formatter) + " To "
 				+ summary.getWeekEndDate().format(formatter);
 
 		WeeklySummaryResponse response = new WeeklySummaryResponse();
@@ -70,8 +73,6 @@ public class WeeklySummaryService {
 
 	public List<WeeklySummaryResponse> getAllSummaries() {
 		List<WeeklySummary> summaries = weeklySummaryRepository.findAll();
-		System.out.println("Raw summaries from DB: " + summaries);
-
 		return summaries.stream().map(summary -> {
 			WeeklySummaryResponse response = new WeeklySummaryResponse();
 			response.setWeekId(summary.getWeekId());
@@ -79,7 +80,7 @@ public class WeeklySummaryService {
 			response.setWeekEndDate(summary.getWeekEndDate());
 			response.setUpcomingTasks(summary.getUpcomingTasks());
 			response.setProjectNames(summary.getListProject().stream().map(Project::getProjectName).toList());
-			response.setWeekRange("WEEK: " + summary.getWeekStartDate() + " To " + summary.getWeekEndDate());
+			response.setWeekRange(WEEK + ":" + summary.getWeekStartDate() + " To " + summary.getWeekEndDate());
 			return response;
 		}).toList();
 	}
@@ -87,11 +88,11 @@ public class WeeklySummaryService {
 	public WeeklySummaryResponse updateSummary(WeeklySummaryRequest request) {
 		Integer weekId = request.getWeekId();
 		WeeklySummary summary = weeklySummaryRepository.findById(weekId)
-				.orElseThrow(() -> new ResourceNotFoundException("Weekly summary not found with id: " + weekId));
+				.orElseThrow(() -> new ResourceNotFoundException(WEEKLY_SUMMARY_NOT_FOUND + weekId));
 
 		List<Project> projects = projectRepository.findAllById(request.getProjectIds());
 		if (projects.isEmpty()) {
-			throw new ResourceNotFoundException("No projects found for given IDs");
+			throw new ResourceNotFoundException(NO_PROJECTS_FOUND);
 		}
 
 		summary.setWeekStartDate(request.getWeekStartDate());
@@ -106,15 +107,14 @@ public class WeeklySummaryService {
 		response.setWeekStartDate(updatedSummary.getWeekStartDate());
 		response.setWeekEndDate(updatedSummary.getWeekEndDate());
 		response.setUpcomingTasks(updatedSummary.getUpcomingTasks());
-		response.setProjectNames(
-				updatedSummary.getListProject().stream().map(Project::getProjectName).collect(Collectors.toList()));
+		response.setProjectNames(updatedSummary.getListProject().stream().map(Project::getProjectName).toList());
 		return response;
 	}
 
 	// SOFT DELETE
 	public WeeklySummary softDeleteSummery(Integer weekId) {
 		WeeklySummary weeklySummary = weeklySummaryRepository.findById(weekId)
-				.orElseThrow(() -> new ResourceNotFoundException("Weekly summary not found"));
+				.orElseThrow(() -> new ResourceNotFoundException(WEEKLY_SUMMARY_NOT_FOUND + weekId));
 		weeklySummary.setSoftDelete(true);
 		return weeklySummaryRepository.save(weeklySummary);
 	}
@@ -122,31 +122,23 @@ public class WeeklySummaryService {
 	// HARD DELETE
 	public void deleteSummary(Integer weekId) {
 		WeeklySummary summary = weeklySummaryRepository.findById(weekId)
-				.orElseThrow(() -> new ResourceNotFoundException("Weekly summary not found with id: " + weekId));
+				.orElseThrow(() -> new ResourceNotFoundException(WEEKLY_SUMMARY_NOT_FOUND + weekId));
 		weeklySummaryRepository.delete(summary);
 	}
 
 	public List<WeeklySummaryResponse> getFormattedWeekRanges() {
 		List<WeeklySummary> summaries = weeklySummaryRepository.findAll();
-		System.out.println("Summaries: " + summaries); // Debug
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy");
-
-		return summaries.stream()
-				// .filter(summary -> !Boolean.TRUE.equals(summary.getSoftDelete())) //
-				// optionally add back
-				.map(summary -> {
-					String range = "WEEK: " + summary.getWeekStartDate().format(formatter) + " To "
-							+ summary.getWeekEndDate().format(formatter);
-
-					WeeklySummaryResponse res = new WeeklySummaryResponse();
-					res.setWeekId(summary.getWeekId());
-					res.setWeekRange(range);
-					res.setWeekStartDate(summary.getWeekStartDate());
-					res.setWeekEndDate(summary.getWeekEndDate());
-
-					System.out.println("Mapped: " + res); // Debug
-					return res;
-				}).toList();
+		return summaries.stream().map(summary -> {
+			String range = WEEK + ":" + summary.getWeekStartDate().format(formatter) + " To "
+					+ summary.getWeekEndDate().format(formatter);
+			WeeklySummaryResponse res = new WeeklySummaryResponse();
+			res.setWeekId(summary.getWeekId());
+			res.setWeekRange(range);
+			res.setWeekStartDate(summary.getWeekStartDate());
+			res.setWeekEndDate(summary.getWeekEndDate());
+			return res;
+		}).toList();
 	}
 
 }
