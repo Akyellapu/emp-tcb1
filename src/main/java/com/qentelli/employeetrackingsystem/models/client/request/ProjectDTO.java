@@ -3,6 +3,7 @@ package com.qentelli.employeetrackingsystem.models.client.request;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ProjectDTO {
-	private Integer projectId;
+	
+	@JsonProperty("projectId")
+	private String formattedProjectId;
 
 	@NotBlank(message = "Project name is required")
 	@Size(max = 20, message = "Project name must not exceed 20 characters")

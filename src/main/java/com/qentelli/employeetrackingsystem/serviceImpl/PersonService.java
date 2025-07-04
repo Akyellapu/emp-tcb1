@@ -1,7 +1,6 @@
 package com.qentelli.employeetrackingsystem.serviceImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -149,16 +148,21 @@ public class PersonService {
 	}
 
 	private PersonDTO convertToDTO(Person person) {
-		PersonDTO dto = modelMapper.map(person, PersonDTO.class);
+	    PersonDTO dto = modelMapper.map(person, PersonDTO.class);
 
-		List<Project> projects = person.getProjects();
-		if (projects != null) {
-			dto.setProjectIds(projects.stream().map(Project::getProjectId).toList());
+	    // Format ID based on role and numeric ID
+	    String prefix = person.getRole() == Roles.MANAGER ? "MAN" : "EMP";
+	    String formattedId = String.format("%s%03d", prefix, person.getPersonId());
+	    dto.setFormattedPersonId(formattedId);
 
-			dto.setProjectNames(projects.stream().map(Project::getProjectName).toList());
-		}
+	    // Map projects if needed
+	    List<Project> projects = person.getProjects();
+	    if (projects != null) {
+	        dto.setProjectIds(projects.stream().map(Project::getProjectId).toList());
+	        dto.setProjectNames(projects.stream().map(Project::getProjectName).toList());
+	    }
 
-		return dto;
+	    return dto;
 	}
 
 }

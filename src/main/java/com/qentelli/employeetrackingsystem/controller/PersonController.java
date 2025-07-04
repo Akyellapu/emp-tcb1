@@ -46,21 +46,29 @@ public class PersonController {
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
-
+	
 	@PostMapping("/tag-projects")
-	public ResponseEntity<AuthResponse<String>> tagProjectsToEmployee(@RequestParam Integer personId,
-			@RequestBody List<Integer> projectIds) {
+    public ResponseEntity<AuthResponse<String>> tagProjectsToEmployee(
+            @RequestParam String personId,
+            @RequestBody List<String> projectIds) {
 
-		logger.info("Tagging projects to person with ID: {}", personId);
+        logger.info("Tagging projects to person with ID: {}", personId);
+        Integer numericId = extractNumericId(personId);
+        List<Integer> numericProjectIds = projectIds.stream()
+        	    .map(Integer::parseInt)
+        	    .toList();
+        personService.tagProjectsToEmployee(numericId, numericProjectIds);
 
-		personService.tagProjectsToEmployee(personId, projectIds);
+        AuthResponse<String> response = new AuthResponse<>(
+                HttpStatus.OK.value(),
+                RequestProcessStatus.SUCCESS,
+                LocalDateTime.now(),
+                "Project(s) tagged successfully",
+                "Projects tagged to person with ID: " + personId
+        );
 
-		AuthResponse<String> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-				LocalDateTime.now(), "Project(s) tagged successfully",
-				"Projects tagged to person with ID: " + personId);
-
-		return ResponseEntity.ok(response);
-	}
+        return ResponseEntity.ok(response);
+    }
 
 	@GetMapping
 	public ResponseEntity<AuthResponse<List<PersonDTO>>> getAllPersons() {
@@ -74,17 +82,25 @@ public class PersonController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<AuthResponse<PersonDTO>> getPersonById(@PathVariable int id) {
-		logger.info("Fetching person by ID: {}", id);
-		PersonDTO dto = personService.getByIdResponse(id);
+	
+	  @GetMapping("/{id}")
+	    public ResponseEntity<AuthResponse<PersonDTO>> getPersonById(@PathVariable String id) {
+	        logger.info("Fetching person by ID: {}", id);
+	        Integer numericId = extractNumericId(id);
+	        PersonDTO dto = personService.getByIdResponse(numericId);
 
-		logger.debug("Person fetched: {}", dto);
-		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-				LocalDateTime.now(), "Person fetched successfully", dto);
+	        logger.debug("Person fetched: {}", dto);
+	        AuthResponse<PersonDTO> response = new AuthResponse<>(
+	                HttpStatus.OK.value(),
+	                RequestProcessStatus.SUCCESS,
+	                LocalDateTime.now(),
+	                "Person fetched successfully",
+	                dto
+	        );
 
-		return ResponseEntity.ok(response);
-	}
+	        return ResponseEntity.ok(response);
+	    }
+	  
 
 	@GetMapping("/search/name")
 	public ResponseEntity<AuthResponse<List<PersonDTO>>> searchByName(@RequestParam String name) {
@@ -146,29 +162,57 @@ public class PersonController {
 		return ResponseEntity.ok(successResponse);
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<AuthResponse<PersonDTO>> updatePerson(@PathVariable int id,
-			@RequestBody PersonDTO updatedDto) {
-		logger.info("Updating person with ID: {}", id);
-		PersonDTO responseDto = personService.update(id, updatedDto);
+	
+	  @PutMapping("/{id}")
+	    public ResponseEntity<AuthResponse<PersonDTO>> updatePerson(@PathVariable String id,
+	                                                                @RequestBody PersonDTO updatedDto) {
+	        logger.info("Updating person with ID: {}", id);
+	        Integer numericId = extractNumericId(id);
+	        PersonDTO responseDto = personService.update(numericId, updatedDto);
 
-		logger.debug("Person updated: {}", responseDto);
-		AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-				"Person updated successfully");
+	        logger.debug("Person updated: {}", responseDto);
+	        AuthResponse<PersonDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
+					"Person updated successfully");
+	        return ResponseEntity.ok(response);
+	    }
+	
+    @DeleteMapping("/{id}")
+    public ResponseEntity<AuthResponse<Void>> deletePerson(@PathVariable String id) {
+        logger.info("Deleting person with ID: {}", id);
+        Integer numericId = extractNumericId(id);
+        personService.deletePersonById(numericId);
 
-		return ResponseEntity.ok(response);
-	}
+        logger.debug("Person deleted: {}", numericId);
+        AuthResponse<Void> response = new AuthResponse<>(
+                HttpStatus.OK.value(),
+                RequestProcessStatus.SUCCESS,
+                "Person deleted successfully"
+        );
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<AuthResponse<Void>> deletePerson(@PathVariable int id) {
-		logger.info("Deleting person with ID: {}", id);
-		personService.deletePersonById(id);
+        return ResponseEntity.ok(response);
+    }
+	
+	
+    private Integer extractNumericId(String input) {
+        if (input == null || input.isBlank()) {
+            throw new IllegalArgumentException("Person ID cannot be null or blank");
+        }
 
-		logger.debug("Person deleted: {}", id);
-		AuthResponse<Void> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-				"Person deleted successfully");
+        input = input.trim();
 
-		return ResponseEntity.ok(response);
-	}
+        // Accept both formatted (EMP008) and plain numeric (8)
+        if (input.matches("(EMP|MAN)\\d+")) {
+            return Integer.parseInt(input.replaceAll("[^\\d]", ""));
+        }
+
+        if (input.matches("\\d+")) {
+            return Integer.parseInt(input);
+        }
+
+        throw new IllegalArgumentException("Invalid ID format: " + input);
+    }
+    
+    
+    
 
 }

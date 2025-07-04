@@ -3,6 +3,7 @@ package com.qentelli.employeetrackingsystem.models.client.request;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.qentelli.employeetrackingsystem.config.FlexibleTechStackDeserializer;
 import com.qentelli.employeetrackingsystem.entity.Roles;
@@ -17,7 +18,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PersonDTO {
-    private Integer personId;
+	@JsonProperty("personId")
+	private String formattedPersonId;
+	
     private String firstName;
     private String lastName;
     private String email;
