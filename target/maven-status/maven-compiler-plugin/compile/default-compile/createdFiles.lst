@@ -31,6 +31,7 @@ com\qentelli\employeetrackingsystem\config\ModelMapperConfig.class
 com\qentelli\employeetrackingsystem\entity\Task.class
 com\qentelli\employeetrackingsystem\exception\AccountNotFoundException.class
 com\qentelli\employeetrackingsystem\repository\ProjectRepository.class
+com\qentelli\employeetrackingsystem\models\client\request\PaginatedResponse.class
 com\qentelli\employeetrackingsystem\entity\TechStack.class
 com\qentelli\employeetrackingsystem\exception\EmployeeTrackingSystemDataExceptionHandler.class
 com\qentelli\employeetrackingsystem\models\client\request\AccountDetailsDto.class

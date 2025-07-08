@@ -31,7 +31,8 @@ public class Project {
     private Integer projectId;
     @Column(unique = true)
     private String projectName;
-    private Boolean softDelete = false;
+    
+    private Boolean projectStatus =true; // true means active, false means inactive
     @CreatedDate
     private LocalDateTime createdAt;
     @CreatedBy

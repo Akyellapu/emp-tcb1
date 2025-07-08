@@ -24,7 +24,8 @@ public class EmployeeTrackingSystemApplication {
 	    return args -> {
 	        List<User> admins = List.of(
 	            new User("superadmin@gmail.com", "Sarath11@", "Sarath", "Teneti", "EMP1001"),
-	            new User("superadmin2@gmail.com", "Madhu123@", "Madhu", "Marrapu", "EMP1002")
+	            new User("superadmin2@gmail.com", "Madhu123@", "Madhu", "Marrapu", "EMP1002"),
+	            new User("Anil@qentelli.com", "Anil123@", "Anil", "Kumar", "EMP2001")
 	        );
 
 	        for (User adminSeed : admins) {

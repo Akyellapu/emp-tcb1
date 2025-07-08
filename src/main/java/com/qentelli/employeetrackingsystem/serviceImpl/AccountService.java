@@ -1,5 +1,7 @@
 package com.qentelli.employeetrackingsystem.serviceImpl;
 
+import org.springframework.data.domain.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,13 +34,13 @@ public class AccountService {
 	private final ProjectRepository projectRepository;
 	private final ModelMapper modelMapper;
 
-
 	// CREATE
 	public Account createAccount(AccountDetailsDto dto) {
 		if (accountRepository.existsByAccountName(dto.getAccountName())) {
 			throw new DuplicateAccountException("An account with this name already exists.");
 		}
 		Account account = modelMapper.map(dto, Account.class);
+
 		return accountRepository.save(account);
 	}
 
@@ -48,20 +50,17 @@ public class AccountService {
 				.toList();
 	}
 
+	public Page<AccountDetailsDto> getAllActiveAccounts(Pageable pageable) {
+		return accountRepository.findByAccountStatusTrue(pageable)
+				.map(account -> modelMapper.map(account, AccountDetailsDto.class));
+	}
+
 	// READ BY ID
 	public AccountDetailsDto getAccountById(Integer id) {
 		Account account = accountRepository.findById(id)
 				.orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
 		return modelMapper.map(account, AccountDetailsDto.class);
 	}
-	
-	 public List<AccountDetailsDto> searchAccountsByName(String name) {
-	        List<Account> accounts = accountRepository.findByAccountNameIgnoreCase(name);
-	        return accounts.stream()
-	                .map(acc -> modelMapper.map(acc, AccountDetailsDto.class))
-	                .toList();
-	    }
-
 
 	// FULL UPDATE
 	public Account updateAccount(Integer id, AccountDetailsDto dto) {
@@ -72,7 +71,7 @@ public class AccountService {
 		existingAccount.setAccountName(dto.getAccountName());
 		existingAccount.setAccountStartDate(dto.getAccountStartDate());
 		existingAccount.setAccountEndDate(dto.getAccountEndDate());
-
+		//existingAccount.setAccountStatus(dto.getAccountStatus());
 		existingAccount.setUpdatedAt(LocalDateTime.now());
 		existingAccount.setUpdatedBy(getAuthenticatedUserFullName());
 
@@ -90,7 +89,8 @@ public class AccountService {
 			account.setAccountStartDate(dto.getAccountStartDate());
 		if (dto.getAccountEndDate() != null)
 			account.setAccountEndDate(dto.getAccountEndDate());
-
+		if (dto.getAccountStatus() != null)
+			account.setAccountStatus(dto.getAccountStatus());
 		account.setUpdatedAt(LocalDateTime.now());
 		account.setUpdatedBy(getAuthenticatedUserFullName());
 
@@ -101,7 +101,7 @@ public class AccountService {
 	public Account softDeleteAccount(Integer id) {
 		Account account = accountRepository.findById(id)
 				.orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
-		account.setSoftDelete(true);
+		account.setAccountStatus(false);// mark as inactive
 		account.setUpdatedAt(LocalDateTime.now());
 		account.setUpdatedBy(getAuthenticatedUserFullName());
 		return accountRepository.save(account);
@@ -112,18 +112,25 @@ public class AccountService {
 	    Account account = accountRepository.findById(id)
 	            .orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
 
-	    // Disconnect projects from persons before deleting them
+	    // Soft delete all associated projects
 	    if (account.getProjects() != null) {
 	        for (Project project : account.getProjects()) {
-	            List<Person> linkedPersons = personRepository.findByProjectsContaining(project);
-	            for (Person person : linkedPersons) {
-	                person.getProjects().remove(project);
-	            }
-	            personRepository.saveAll(linkedPersons); // Persist changes
-	            projectRepository.delete(project);        // Now safe to delete
+	            project.setProjectStatus(false);
+	            project.setUpdatedAt(LocalDateTime.now());
+	            project.setUpdatedBy(getAuthenticatedUserFullName());
+	            projectRepository.save(project);
 	        }
 	    }
-	    accountRepository.delete(account); // Delete the account itself
+
+	    // Soft delete the account
+	    account.setAccountStatus(false);
+	    account.setUpdatedAt(LocalDateTime.now());
+	    account.setUpdatedBy(getAuthenticatedUserFullName());
+	    accountRepository.save(account);
+	}
+
+	public Page<Account> searchAccountsByExactName(String name, Pageable pageable) {
+		return accountRepository.findByAccountNameContainingIgnoreCase(name, pageable);
 	}
 
 	// Extracted method for full name resolution

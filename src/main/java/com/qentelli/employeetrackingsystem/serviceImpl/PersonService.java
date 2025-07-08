@@ -1,9 +1,10 @@
 package com.qentelli.employeetrackingsystem.serviceImpl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,17 +79,25 @@ public class PersonService {
 
 		personRepo.save(person);
 	}
-	
-	public List<PersonDTO> searchByName(String name) {
-	    List<Person> people = personRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
-	    return people.stream()
-	        .map(this::convertToDTO)
-	        .toList();
-	}
 
+//	public List<PersonDTO> searchByName(String name) {
+//		List<Person> people = personRepo.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
+//		return people.stream().map(this::convertToDTO).toList();
+//	}
+	
+	public Page<PersonDTO> searchPersonsByName(String name, Pageable pageable) {
+	    Page<Person> page = personRepo
+	        .findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name, pageable);
+	    return page.map(this::convertToDTO);
+	}
 
 	public List<PersonDTO> getAllResponses() {
 		return personRepo.findAll().stream().map(this::convertToDTO).toList();
+	}
+	
+	public Page<PersonDTO> getAllActivePersons(Pageable pageable) {
+	    Page<Person> page = personRepo.findByPersonStatusTrue(pageable);
+	    return page.map(this::convertToDTO);
 	}
 
 	public PersonDTO getByIdResponse(Integer id) {
@@ -100,15 +109,18 @@ public class PersonService {
 		return personRepo.findByRole(role).stream().map(this::convertToDTO).toList();
 	}
 	
-	public boolean isProjectExists(Integer projectId) {
-	    return projectRepo.existsById(projectId);
+	public Page<PersonDTO> getByRoleResponse(Roles role, Pageable pageable) {
+	    Page<Person> page = personRepo.findByRoleAndPersonStatusTrue(role, pageable);
+	    return page.map(this::convertToDTO);
 	}
 
-	public List<PersonDTO> getPersonsByProjectId(Integer projectId) {
-	    List<Person> persons = personRepo.findByProjects_ProjectId(projectId);
-	    return persons.stream()
-	                  .map(this::convertToDTO) 
-	                  .toList();
+	public boolean isProjectExists(Integer projectId) {
+		return projectRepo.existsById(projectId);
+	}
+
+	public Page<PersonDTO> getPersonsByProjectId(Integer projectId, Pageable pageable) {
+	    Page<Person> page = personRepo.findByProjects_ProjectId(projectId, pageable);
+	    return page.map(this::convertToDTO);
 	}
 
 	@Transactional
@@ -139,13 +151,14 @@ public class PersonService {
 	}
 
 	@Transactional
-	public void deletePersonById(Integer personId) {
+	public void softDeletePersonById(Integer personId) {
 		Person person = personRepo.findById(personId)
 				.orElseThrow(() -> new PersonNotFoundException(PERSON_NOT_FOUND + "with id :" + personId));
 
-		person.getProjects().clear();
+		person.setPersonStatus(false); // Mark as inactive
+		// person.getProjects().clear(); // Optional: detach projects if needed
 
-		personRepo.delete(person);
+		personRepo.save(person); // Persist the change
 	}
 
 	private PersonDTO convertToDTO(Person person) {
