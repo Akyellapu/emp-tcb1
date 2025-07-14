@@ -35,7 +35,8 @@ public class Account {
 	private String accountName;
 	private LocalDate accountStartDate;
 	private LocalDate accountEndDate;
-	private Boolean softDelete = false;
+	
+	private Boolean accountStatus= true; // true means active, false means inactive
 	
 	@CreatedDate
 	private LocalDateTime createdAt;

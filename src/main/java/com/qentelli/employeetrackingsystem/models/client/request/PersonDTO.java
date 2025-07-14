@@ -25,6 +25,7 @@ public class PersonDTO {
     private String password;
     private String confirmPassword;
     private Roles role;
+    private Boolean personStatus=true; // true for active, false for inactive;
     @JsonDeserialize(using = FlexibleTechStackDeserializer.class)
     private TechStack techStack;
     

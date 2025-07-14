@@ -15,6 +15,7 @@ public class AccountDetailsDto {
     private String accountName;
     private LocalDate accountStartDate;
     private LocalDate accountEndDate;
+	private Boolean accountStatus=true; // true means active, false means inactive
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime updatedAt;

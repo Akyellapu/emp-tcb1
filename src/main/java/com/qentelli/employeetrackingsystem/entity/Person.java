@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -39,7 +38,7 @@ public class Person {
     
     @Enumerated(EnumType.STRING)
     private Roles role;
-
+    private Boolean personStatus=true; // true for active, false for inactive;
     @ManyToMany
     @JoinTable(
         name = "person_project",

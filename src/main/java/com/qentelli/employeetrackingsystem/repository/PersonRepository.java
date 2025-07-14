@@ -3,6 +3,8 @@ package com.qentelli.employeetrackingsystem.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -19,12 +21,17 @@ public interface PersonRepository extends JpaRepository<Person, Integer> {
 
 	List<Person> findByRole(Roles role);
 	
+	Page<Person> findByRoleAndPersonStatusTrue(Roles role, Pageable pageable);
+	
 	List<Person> findByProjectsContaining(Project project);
 	
 	Optional<Person> findByPersonId(Integer personId);
+		 
+	Page<Person> findByProjects_ProjectId(Integer projectId, Pageable pageable);
 	
-	List<Person> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(String firstName, String lastName);
+	Page<Person> findByPersonStatusTrue(Pageable pageable);
 	 
-	 List<Person> findByProjects_ProjectId(Integer projectId);
+	Page<Person> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+			    String firstName, String lastName, Pageable pageable);
 
 }

@@ -3,6 +3,7 @@ com\qentelli\employeetrackingsystem\models\client\request\ProjectDTO.class
 com\qentelli\employeetrackingsystem\models\client\response\UserDtoResponse.class
 com\qentelli\employeetrackingsystem\entity\Person.class
 com\qentelli\employeetrackingsystem\exception\RequestProcessStatus.class
+com\qentelli\employeetrackingsystem\models\client\response\PaginatedResponse.class
 com\qentelli\employeetrackingsystem\models\client\request\ViewReportRequest.class
 com\qentelli\employeetrackingsystem\exception\DuplicateAccountException.class
 com\qentelli\employeetrackingsystem\repository\PersonRepository.class

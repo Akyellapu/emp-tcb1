@@ -7,4 +7,5 @@ import com.qentelli.employeetrackingsystem.entity.WeeklySummary;
 
 @Repository
 public interface WeeklySummaryRepository extends JpaRepository<WeeklySummary, Integer> {
+
 }

@@ -6,9 +6,9 @@ spring:
     name: Employee-Tracking-System
 
   datasource:
-    url: jdbc:postgresql://ep-super-pond-a8z4my7u-pooler.eastus2.azure.neon.tech:5432/emp-track?sslmode=require
-    username: emp-track_owner
-    password: npg_gtXW9CpL0RiD
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}?sslmode=require
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -24,3 +24,4 @@ spring:
 
   main:
     allow-circular-references: true
+    
