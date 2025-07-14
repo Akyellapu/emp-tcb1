@@ -97,15 +97,6 @@ public class AccountService {
 		return accountRepository.save(account);
 	}
 
-	// SOFT DELETE
-	public Account softDeleteAccount(Integer id) {
-		Account account = accountRepository.findById(id)
-				.orElseThrow(() -> new AccountNotFoundException(ACCOUNT_NOT_FOUND + id));
-		account.setAccountStatus(false);// mark as inactive
-		account.setUpdatedAt(LocalDateTime.now());
-		account.setUpdatedBy(getAuthenticatedUserFullName());
-		return accountRepository.save(account);
-	}
 
 	@Transactional
 	public void deleteAccount(Integer id) {
@@ -128,6 +119,8 @@ public class AccountService {
 	    account.setUpdatedBy(getAuthenticatedUserFullName());
 	    accountRepository.save(account);
 	}
+	
+	
 
 	public Page<Account> searchAccountsByExactName(String name, Pageable pageable) {
 		return accountRepository.findByAccountNameContainingIgnoreCase(name, pageable);

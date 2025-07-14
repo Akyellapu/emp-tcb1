@@ -14,8 +14,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
 	Page<Account> findByAccountNameContainingIgnoreCase(String accountName, Pageable pageable);
 
-	Page<Account> findAll(Pageable pageable);
-
 	Page<Account> findByAccountStatusTrue(Pageable pageable);
 
 }

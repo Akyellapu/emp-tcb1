@@ -7,8 +7,9 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,9 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.qentelli.employeetrackingsystem.entity.Project;
 import com.qentelli.employeetrackingsystem.exception.DuplicateProjectException;
 import com.qentelli.employeetrackingsystem.exception.RequestProcessStatus;
-import com.qentelli.employeetrackingsystem.models.client.request.PaginatedResponse;
 import com.qentelli.employeetrackingsystem.models.client.request.ProjectDTO;
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
+import com.qentelli.employeetrackingsystem.models.client.response.PaginatedResponse;
 import com.qentelli.employeetrackingsystem.serviceImpl.ProjectService;
 
 import jakarta.validation.Valid;
@@ -55,56 +56,82 @@ public class ProjectController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-//	@GetMapping
-//	public ResponseEntity<AuthResponse<List<ProjectDTO>>> getAllProjects() {
-//		logger.info("Fetching all projects");
-//		List<ProjectDTO> projectList = projectService.getAll();
-//
-//		logger.debug("Number of projects fetched: {}", projectList.size());
-//		AuthResponse<List<ProjectDTO>> response = new AuthResponse<>(HttpStatus.OK.value(),
-//				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Projects fetched successfully", projectList);
-//
-//		return ResponseEntity.ok(response);
-//	}
 
 	@GetMapping("/search")
-	public ResponseEntity<AuthResponse<PaginatedResponse<ProjectDTO>>> searchProjectsByName(@RequestParam String name,
-			@PageableDefault(size = 10, sort = "projectName") Pageable pageable) {
+	public ResponseEntity<AuthResponse<PaginatedResponse<ProjectDTO>>> searchProjectsByNamePaginated(
+	        @RequestParam String name,
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size,
+	        @RequestParam(defaultValue = "projectName") String sortBy
+	) {
+	    logger.info("Searching projects by name (case-insensitive): name={}, page={}, size={}, sortBy={}", name, page, size, sortBy);
 
-		logger.info("Searching projects by name (case-insensitive): {}", name);
-		Page<Project> projectPage = projectService.searchProjectsByExactName(name, pageable);
+	    Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+	    Page<Project> projectPage = projectService.searchProjectsByExactName(name, pageable);
 
-		List<ProjectDTO> dtoList = projectPage.getContent().stream()
-				.map(project -> modelMapper.map(project, ProjectDTO.class)).toList();
+	    List<ProjectDTO> dtoList = projectPage.getContent().stream()
+	            .map(project -> modelMapper.map(project, ProjectDTO.class))
+	            .toList();
 
-		PaginatedResponse<ProjectDTO> paginated = new PaginatedResponse<>(dtoList, projectPage.getNumber(),
-				projectPage.getSize(), projectPage.getTotalElements(), projectPage.getTotalPages(),
-				projectPage.isLast());
+	    PaginatedResponse<ProjectDTO> paginated = new PaginatedResponse<>(
+	            dtoList,
+	            projectPage.getNumber(),
+	            projectPage.getSize(),
+	            projectPage.getTotalElements(),
+	            projectPage.getTotalPages(),
+	            projectPage.isLast()
+	    );
 
-		AuthResponse<PaginatedResponse<ProjectDTO>> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Projects fetched successfully", paginated);
+	    logger.debug("Search results fetched: matchCount={}, totalPages={}",
+	                 projectPage.getNumberOfElements(), projectPage.getTotalPages());
 
-		return ResponseEntity.ok(response);
+	    AuthResponse<PaginatedResponse<ProjectDTO>> response = new AuthResponse<>(
+	            HttpStatus.OK.value(),
+	            RequestProcessStatus.SUCCESS,
+	            LocalDateTime.now(),
+	            "Projects fetched successfully",
+	            paginated
+	    );
+
+	    return ResponseEntity.ok(response);
 	}
 
 	@GetMapping()
-	public ResponseEntity<AuthResponse<PaginatedResponse<ProjectDTO>>> getactiveProjects(
-			@PageableDefault(size = 10, sort = "projectName") Pageable pageable) {
+	public ResponseEntity<AuthResponse<PaginatedResponse<ProjectDTO>>> getActiveProjectsPaginated(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size,
+	        @RequestParam(defaultValue = "projectName") String sortBy
+	) {
+	    logger.info("Fetching paginated list of active projects: page={}, size={}, sortBy={}", page, size, sortBy);
 
-		logger.info("Fetching all projects with status = true (active)");
-		Page<Project> projectPage = projectService.getactiveProjects(pageable);
+	    Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+	    Page<Project> projectPage = projectService.getactiveProjects(pageable);
 
-		List<ProjectDTO> dtoList = projectPage.getContent().stream()
-				.map(project -> modelMapper.map(project, ProjectDTO.class)).toList();
+	    List<ProjectDTO> dtoList = projectPage.getContent().stream()
+	            .map(project -> modelMapper.map(project, ProjectDTO.class))
+	            .toList();
 
-		PaginatedResponse<ProjectDTO> paginated = new PaginatedResponse<>(dtoList, projectPage.getNumber(),
-				projectPage.getSize(), projectPage.getTotalElements(), projectPage.getTotalPages(),
-				projectPage.isLast());
+	    PaginatedResponse<ProjectDTO> paginated = new PaginatedResponse<>(
+	            dtoList,
+	            projectPage.getNumber(),
+	            projectPage.getSize(),
+	            projectPage.getTotalElements(),
+	            projectPage.getTotalPages(),
+	            projectPage.isLast()
+	    );
 
-		AuthResponse<PaginatedResponse<ProjectDTO>> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Active projects fetched successfully", paginated);
+	    logger.debug("Active projects fetched: count={}, totalPages={}",
+	                 projectPage.getNumberOfElements(), projectPage.getTotalPages());
 
-		return ResponseEntity.ok(response);
+	    AuthResponse<PaginatedResponse<ProjectDTO>> response = new AuthResponse<>(
+	            HttpStatus.OK.value(),
+	            RequestProcessStatus.SUCCESS,
+	            LocalDateTime.now(),
+	            "Active projects fetched successfully",
+	            paginated
+	    );
+
+	    return ResponseEntity.ok(response);
 	}
 
 	@PutMapping("/{id}")
@@ -119,21 +146,6 @@ public class ProjectController {
 
 		return ResponseEntity.ok(response);
 	}
-
-//	@PatchMapping("/partialUpdateProject/{id}")
-//	public ResponseEntity<AuthResponse<ProjectDTO>> partiallyUpdateProject(@PathVariable int id,
-//			@RequestBody ProjectDTO patchDto) {
-//		logger.info("Partially updating project with ID: {}", id);
-//		ProjectDTO partiallyUpdatedProject = projectService.partialUpdateProject(id, patchDto);
-//
-//		logger.debug("Project partially updated: {}", partiallyUpdatedProject);
-//		AuthResponse<ProjectDTO> response = new AuthResponse<>(HttpStatus.OK.value(), RequestProcessStatus.SUCCESS,
-//				"Project partially updated successfully");
-//
-//		return ResponseEntity.ok(response);
-//	}
-
-
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<AuthResponse<ProjectDTO>> deleteProject(@PathVariable Integer id) {

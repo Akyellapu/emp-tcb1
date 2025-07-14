@@ -1,0 +1,22 @@
+
+# Maven build artifacts
+target/
+
+# Version control
+.git/
+.gitignore
+
+# IDE files
+.idea/
+*.iml
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Docker-related files
+Dockerfile
+.dockerignore
+
+# Documentation
+README.md

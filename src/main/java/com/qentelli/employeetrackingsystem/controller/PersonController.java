@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.qentelli.employeetrackingsystem.entity.Roles;
 import com.qentelli.employeetrackingsystem.exception.RequestProcessStatus;
-import com.qentelli.employeetrackingsystem.models.client.request.PaginatedResponse;
 import com.qentelli.employeetrackingsystem.models.client.request.PersonDTO;
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
+import com.qentelli.employeetrackingsystem.models.client.response.PaginatedResponse;
 import com.qentelli.employeetrackingsystem.serviceImpl.PersonService;
 
 import jakarta.validation.Valid;

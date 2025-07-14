@@ -7,13 +7,13 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.qentelli.employeetrackingsystem.entity.Account;
 import com.qentelli.employeetrackingsystem.exception.RequestProcessStatus;
 import com.qentelli.employeetrackingsystem.models.client.request.AccountDetailsDto;
-import com.qentelli.employeetrackingsystem.models.client.request.PaginatedResponse;
 import com.qentelli.employeetrackingsystem.models.client.response.AuthResponse;
+import com.qentelli.employeetrackingsystem.models.client.response.PaginatedResponse;
 import com.qentelli.employeetrackingsystem.serviceImpl.AccountService;
 
 import jakarta.validation.Valid;
@@ -56,64 +56,77 @@ public class AccountController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
-//	@GetMapping
-//	public ResponseEntity<AuthResponse<List<AccountDetailsDto>>> getAllAccounts() {
-//		logger.info("Fetching all accounts");
-//		List<AccountDetailsDto> accounts = accountService.getAllAccounts();
-//
-//		logger.debug("Accounts retrieved: {}", accounts.size());
-//		AuthResponse<List<AccountDetailsDto>> response = new AuthResponse<>(HttpStatus.OK.value(),
-//				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Accounts fetched successfully", accounts);
-//
-//		return ResponseEntity.ok(response);
-//	}
-
-//	@GetMapping("/{id}")
-//	public ResponseEntity<AuthResponse<AccountDetailsDto>> getAccountById(@PathVariable int id) {
-//		logger.info("Fetching account by ID: {}", id);
-//		AccountDetailsDto dto = accountService.getAccountById(id);
-//
-//		logger.debug("Account fetched: {}", dto);
-//		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.OK.value(),
-//				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Account fetched successfully", dto);
-//
-//		return ResponseEntity.ok(response);
-//	}
-
 	@GetMapping()
-	public ResponseEntity<AuthResponse<PaginatedResponse<AccountDetailsDto>>> getAllActiveAccounts(
-			@PageableDefault(size = 5, sort = "accountName") Pageable pageable) {
+	public ResponseEntity<AuthResponse<PaginatedResponse<AccountDetailsDto>>> getAllActiveAccountsPaginated(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "5") int size,
+	        @RequestParam(defaultValue = "accountName") String sortBy
+	) {
+	    logger.info("Fetching paginated list of active accounts: page={}, size={}, sortBy={}", page, size, sortBy);
 
-		logger.info("Fetching all active (non-deleted) accounts");
-		Page<AccountDetailsDto> page = accountService.getAllActiveAccounts(pageable);
+	    Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+	    Page<AccountDetailsDto> accountPage = accountService.getAllActiveAccounts(pageable);
 
-		PaginatedResponse<AccountDetailsDto> paginated = new PaginatedResponse<>(page.getContent(), page.getNumber(),
-				page.getSize(), page.getTotalElements(), page.getTotalPages(), page.isLast());
+	    PaginatedResponse<AccountDetailsDto> paginated = new PaginatedResponse<>(
+	            accountPage.getContent(),
+	            accountPage.getNumber(),
+	            accountPage.getSize(),
+	            accountPage.getTotalElements(),
+	            accountPage.getTotalPages(),
+	            accountPage.isLast()
+	    );
 
-		AuthResponse<PaginatedResponse<AccountDetailsDto>> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Active accounts fetched successfully", paginated);
+	    logger.debug("Paginated accounts fetched: count={}, totalPages={}",
+	                 accountPage.getNumberOfElements(), accountPage.getTotalPages());
 
-		return ResponseEntity.ok(response);
+	    AuthResponse<PaginatedResponse<AccountDetailsDto>> response = new AuthResponse<>(
+	            HttpStatus.OK.value(),
+	            RequestProcessStatus.SUCCESS,
+	            LocalDateTime.now(),
+	            "Paginated active accounts fetched successfully",
+	            paginated
+	    );
+
+	    return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<AuthResponse<PaginatedResponse<AccountDetailsDto>>> searchAccountsByName(
-			@RequestParam String name, @PageableDefault(size = 10, sort = "accountName") Pageable pageable) {
+	public ResponseEntity<AuthResponse<PaginatedResponse<AccountDetailsDto>>> searchAccountsByNamePaginated(
+	        @RequestParam String name,
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size,
+	        @RequestParam(defaultValue = "accountName") String sortBy
+	) {
+	    logger.info("Searching accounts by name (case-insensitive): name={}, page={}, size={}, sortBy={}", name, page, size, sortBy);
 
-		logger.info("Searching accounts by name (case-insensitive): {}", name);
-		Page<Account> accountPage = accountService.searchAccountsByExactName(name, pageable);
+	    Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+	    Page<Account> accountPage = accountService.searchAccountsByExactName(name, pageable);
 
-		List<AccountDetailsDto> dtoList = accountPage.getContent().stream()
-				.map(account -> modelMapper.map(account, AccountDetailsDto.class)).toList();
+	    List<AccountDetailsDto> dtoList = accountPage.getContent().stream()
+	            .map(account -> modelMapper.map(account, AccountDetailsDto.class))
+	            .toList();
 
-		PaginatedResponse<AccountDetailsDto> paginated = new PaginatedResponse<>(dtoList, accountPage.getNumber(),
-				accountPage.getSize(), accountPage.getTotalElements(), accountPage.getTotalPages(),
-				accountPage.isLast());
+	    PaginatedResponse<AccountDetailsDto> paginated = new PaginatedResponse<>(
+	            dtoList,
+	            accountPage.getNumber(),
+	            accountPage.getSize(),
+	            accountPage.getTotalElements(),
+	            accountPage.getTotalPages(),
+	            accountPage.isLast()
+	    );
 
-		AuthResponse<PaginatedResponse<AccountDetailsDto>> response = new AuthResponse<>(HttpStatus.OK.value(),
-				RequestProcessStatus.SUCCESS, LocalDateTime.now(), "Accounts fetched successfully", paginated);
+	    logger.debug("Search results fetched: matchCount={}, totalPages={}",
+	            accountPage.getNumberOfElements(), accountPage.getTotalPages());
 
-		return ResponseEntity.ok(response);
+	    AuthResponse<PaginatedResponse<AccountDetailsDto>> response = new AuthResponse<>(
+	            HttpStatus.OK.value(),
+	            RequestProcessStatus.SUCCESS,
+	            LocalDateTime.now(),
+	            "Accounts fetched successfully",
+	            paginated
+	    );
+
+	    return ResponseEntity.ok(response);
 	}
 
 	@PutMapping("/{id}")
@@ -129,33 +142,6 @@ public class AccountController {
 
 		return ResponseEntity.ok(response);
 	}
-
-//	@PatchMapping("/{id}")
-//	public ResponseEntity<AuthResponse<AccountDetailsDto>> partialUpdateAccount(@PathVariable int id,
-//			@RequestBody AccountDetailsDto partialDto) {
-//		logger.info("Partially updating account with ID: {}", id);
-//		Account updated = accountService.partialUpdateAccount(id, partialDto);
-//		AccountDetailsDto responseDto = modelMapper.map(updated, AccountDetailsDto.class);
-//
-//		logger.debug("Account partially updated: {}", responseDto);
-//		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.OK.value(),
-//				RequestProcessStatus.SUCCESS, "Account partially updated successfully");
-//
-//		return ResponseEntity.ok(response);
-//	}
-
-//	@DeleteMapping("/soft/{id}")
-//	public ResponseEntity<AuthResponse<AccountDetailsDto>> softDeleteAccount(@PathVariable int id) {
-//		logger.info("Soft deleting account with ID: {}", id);
-//		accountService.softDeleteAccount(id);
-//
-//		logger.debug("Account soft deleted with ID: {}", id);
-//		AuthResponse<AccountDetailsDto> response = new AuthResponse<>(HttpStatus.OK.value(),
-//				RequestProcessStatus.SUCCESS, "Account soft deleted successfully");
-//
-//		return ResponseEntity.ok(response);
-//	}
-
 	@DeleteMapping("/{id}")
 	public ResponseEntity<AuthResponse<AccountDetailsDto>> deleteAccount(@PathVariable int id) {
 		logger.info("Permanently deleting account with ID: {}", id);
